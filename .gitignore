@@ -1,0 +1,110 @@
+# ==========================
+# 기본적인 안드로이드 프로젝트 무시 파일
+# ==========================
+
+### Gradle ###
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+
+### Local configuration ###
+/local.properties
+/.idea/
+/.idea/**/workspace.xml
+/.idea/**/tasks.xml
+/.idea/**/shelf/
+/.idea/caches/
+/.idea/modules.xml
+/.idea/libraries/
+/.idea/httpRequests/
+/.idea/deploymentTargetDropDown.xml
+/.idea/assetWizardSettings.xml
+/.idea/compiler.xml
+
+### OS별 불필요 파일 ###
+# macOS
+.DS_Store
+*.swp
+*.swo
+*.swn
+*.sublime-workspace
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ==========================
+# 특정 라이브러리 관련 무시 파일
+# ==========================
+
+### Firebase ###
+/app/google-services.json
+/firebase/
+
+### Android Studio ###
+/captures/
+
+### Kotlin ###
+*.iml
+*.class
+*.log
+
+### Jetpack Compose Preview ###
+/app/src/debug/
+
+### Generated Code ###
+/gen/
+bin/
+*.apk
+*.ap_
+*.aab
+*.aar
+
+### Proguard ###
+proguard/
+
+### Dependencies ###
+/out/
+/node_modules/
+/yarn.lock
+/package-lock.json
+
+# ==========================
+# 개인 키, 환경 변수 관련
+# ==========================
+
+### API 키 및 인증 정보 ###
+/app/src/main/assets/secrets.json
+/secrets.properties
+
+### Precompiled Scripts ###
+/build-logic/build/
+/build-logic/.gradle/
+
+# ==========================
+# 특정 모듈 관련 무시 파일
+# ==========================
+
+### Data 모듈 관련 ###
+/data/src/main/res/raw/*.json
+
+### UI 모듈 관련 ###
+/ui/src/main/res/drawable/
+
+### Local DB (Room, SQLite) ###
+*.db
+*.db-shm
+*.db-wal
+
+# ==========================
+# 기타 불필요한 파일들
+# ==========================
+/test-output/
+/app/src/androidTest/resources/
+/app/src/test/resources/
+/generated/
+/output.json
