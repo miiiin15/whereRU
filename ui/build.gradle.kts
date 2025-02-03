@@ -9,6 +9,10 @@ android {
 }
 
 dependencies {
+    implementation(projects.common)
+    implementation(projects.dataResource)
+    implementation(projects.presentation)
+
     implementation(libs.androidx.core)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.runtime)
