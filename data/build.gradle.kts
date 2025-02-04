@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
     implementation(projects.domain)
-    // TODO : dataResource implementation 하기
+    implementation(projects.dataResource)
 }
