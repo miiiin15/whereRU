@@ -7,6 +7,8 @@
     <dimen name="margin_title_to_content">16dp</dimen>
 
     <!-- 추가적으로 많이 쓰이는 UI 요소 -->
+    <dimen name="corner_radius">12dp</dimen>
+    <dimen name="border_width">2dp</dimen>
     <dimen name="spacing_input_field">12dp</dimen>
     <dimen name="button_height">48dp</dimen>
     <dimen name="icon_size">24dp</dimen>
