@@ -11,8 +11,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Base.Theme.Whereru"
-        tools:targetApi="31">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true">

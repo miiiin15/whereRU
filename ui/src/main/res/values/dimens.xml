@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 공통 패딩 및 마진 -->
+    <dimen name="padding_horizontal">16dp</dimen>
+    <dimen name="margin_top_title">24dp</dimen>
+    <dimen name="margin_bottom_button">16dp</dimen>
+    <dimen name="margin_title_to_content">16dp</dimen>
+
+    <!-- 추가적으로 많이 쓰이는 UI 요소 -->
+    <dimen name="spacing_input_field">12dp</dimen>
+    <dimen name="button_height">48dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="small_button_height">40dp</dimen>
+    <dimen name="list_item_height">56dp</dimen>
+
+    <!-- 텍스트 사이즈 -->
+    <dimen name="text_size_title">36sp</dimen>
+    <dimen name="text_size_subtitle">24sp</dimen>
+    <dimen name="text_size_description">16sp</dimen>
+    <dimen name="text_size_large">22sp</dimen>
+    <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_button">16sp</dimen>
+    <dimen name="text_size_input">16sp</dimen>
+</resources>

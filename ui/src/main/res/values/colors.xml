@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- 기본 색상 -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- 강조 및 상태 색상 -->
+    <color name="error">#FF4322</color>
+    <color name="gray1">#BDBDBD</color> <!-- 연한 회색 -->
+    <color name="gray2">#9E9E9E</color> <!-- 더 진한 회색 -->
 </resources>
