@@ -2,4 +2,6 @@ plugins {
     id("module.kotlin")
 }
 
-// TODO : dataResource implementation 하기
+dependencies {
+    implementation(projects.dataResource)
+}
