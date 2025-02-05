@@ -3,6 +3,7 @@ package com.miiiin15.whereru.ui.splash
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.miiiin15.whereru.common.utils.PermissionManager
 import com.miiiin15.whereru.presentation.viewmodel.AppViewModel
 import com.miiiin15.whereru.ui.R
@@ -31,7 +32,7 @@ class SplashFragment :
     }
 
     private fun proceedToNextScreen() {
-        // TODO: 다음 화면
+        findNavController().navigate(SplashFragmentDirections.actionSplashToAuth())
     }
 
     override fun handleEvent(event: AppViewModel.Event) {}
