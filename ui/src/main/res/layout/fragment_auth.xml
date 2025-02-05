@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="view"
+            type="com.miiiin15.whereru.ui.auth.AuthFragment" />
+
+        <variable
+            name="vm"
+            type="com.miiiin15.whereru.presentation.viewmodel.AuthViewModel" />
+
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/padding_horizontal"
+        tools:context=".ui.auth.AuthFragment">
+
+        <!-- 로그인 타이틀 -->
+        <TextView
+            android:id="@+id/auth_title_text"
+            style="@style/Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_top_title"
+            android:layout_marginBottom="@dimen/margin_title_to_content"
+            android:text="로그인"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 입력 필드 컨테이너 -->
+        <LinearLayout
+            android:id="@+id/auth_input_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/auth_button_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/auth_title_text">
+
+            <!-- 이메일 입력 -->
+            <EditText
+                android:id="@+id/auth_email_input"
+                style="@style/InputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_input_field"
+                android:hint="이메일 입력"
+                android:inputType="textEmailAddress"
+                android:text="@={vm.email}" />
+
+            <!-- 비밀번호 입력 -->
+            <EditText
+                android:id="@+id/auth_password_input"
+                style="@style/InputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_input_field"
+                android:hint="비밀번호 입력"
+                android:inputType="textPassword"
+                android:text="@={vm.password}" />
+
+        </LinearLayout>
+
+        <!-- 버튼 컨테이너 -->
+        <LinearLayout
+            android:id="@+id/auth_button_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_bottom_button"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- 로그인 버튼 -->
+            <Button
+                android:id="@+id/auth_login_button"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_input_field"
+                android:text="로그인" />
+
+            <!-- 회원가입 버튼 -->
+            <Button
+                android:id="@+id/auth_register_button"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="회원가입" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
