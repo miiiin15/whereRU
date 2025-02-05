@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         google()
+        jcenter()
     }
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -15,3 +16,4 @@ include(":data")
 include(":data-resource")
 include(":presentation")
 include(":common")
+include(":remote")
