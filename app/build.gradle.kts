@@ -3,6 +3,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -43,6 +44,11 @@ android {
 
 dependencies {
     implementation(projects.ui)
+    implementation(projects.presentation)
+    implementation(projects.domain)
+    implementation(projects.data)
+    implementation(projects.remote)
+    implementation(projects.common)
 
     implementation(libs.androidx.multidex)
     implementation(libs.hilt.android)

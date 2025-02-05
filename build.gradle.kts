@@ -4,6 +4,7 @@ buildscript {
         mavenCentral()
         google()
         gradlePluginPortal()
+        jcenter()
     }
     dependencies {
         classpath(libs.kotlin)
@@ -13,10 +14,15 @@ buildscript {
     }
 }
 
+plugins {
+    id("com.google.gms.google-services") version "4.4.2" apply false
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
+        jcenter()
         maven(url = "https://www.jitpack.io")
     }
 }
