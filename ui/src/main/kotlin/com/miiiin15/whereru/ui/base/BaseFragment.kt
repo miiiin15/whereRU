@@ -75,12 +75,16 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
         }
     }
 
-    fun showCustomAlert(message: String) {
-        AlertDialog.Builder(requireContext()).setOnDismissListener {
-            viewModel.clearAlert()
-        }
+    fun showCustomAlert(message: String, onConfirmed: (() -> Unit)? = null) {
+        AlertDialog.Builder(requireContext())
+            .setOnDismissListener {
+                viewModel.clearAlert()
+            }
             .setMessage(message)
-            .setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton("확인") { dialog, _ ->
+                dialog.dismiss()
+                onConfirmed?.invoke()
+            }
             .create()
             .show()
     }
