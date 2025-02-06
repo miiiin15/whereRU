@@ -69,12 +69,16 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
 
     private fun observeAlert() = repeatOnStarted {
         viewModel.alertMessage.observe {
-            showCustomAlert(it)
+            if (it.isNotBlank()) {
+                showCustomAlert(it)
+            }
         }
     }
 
     fun showCustomAlert(message: String) {
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext()).setOnDismissListener {
+            viewModel.clearAlert()
+        }
             .setMessage(message)
             .setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
             .create()

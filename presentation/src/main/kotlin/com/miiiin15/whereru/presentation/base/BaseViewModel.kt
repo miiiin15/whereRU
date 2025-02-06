@@ -73,9 +73,7 @@ abstract class BaseViewModel<VE : ViewEvent> : ViewModel() {
 
     fun handleError(throwable: Throwable?, tag: String) {
         throwable?.printStackTrace()
-        hideLoading(tag)
         showAlert(throwable?.message ?: "Unknown error")
-        // TODO: 에러 처리 로직 추가 ex) log, toast, snackbar, etc.
     }
 
     // Flow<DataResource<T>>를 구독하여 데이터를 처리하는 확장 함수
