@@ -3,6 +3,7 @@ package com.miiiin15.whereru.ui.auth
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.miiiin15.whereru.presentation.viewmodel.AuthViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
@@ -20,7 +21,9 @@ class AuthFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel {
-            authState observe { }
+            uid observe {
+                findNavController().navigate(AuthFragmentDirections.actionAuthToHome())
+            }
         }
         binding{
             vm = viewModel
