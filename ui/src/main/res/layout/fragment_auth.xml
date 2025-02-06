@@ -87,6 +87,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/spacing_input_field"
+                android:enabled="@{vm.isButtonEnabled()}"
+                android:onClick="@{() -> vm.login()}"
                 android:text="로그인" />
 
             <!-- 회원가입 버튼 -->
@@ -95,6 +97,8 @@
                 style="@style/ButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:enabled="@{vm.isButtonEnabled()}"
+                android:onClick="@{() -> vm.register()}"
                 android:text="회원가입" />
 
         </LinearLayout>
