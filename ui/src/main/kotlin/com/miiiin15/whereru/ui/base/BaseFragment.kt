@@ -1,5 +1,6 @@
 package com.miiiin15.whereru.ui.base
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -51,6 +52,7 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
         }
         observeEvent()
         observeLoading()
+        observeAlert()
     }
 
     private fun observeEvent() = repeatOnStarted {
@@ -63,6 +65,20 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
             if (isLoading) loadingDialog.show(childFragmentManager, null)
             else loadingDialog.dismiss()
         }
+    }
+
+    private fun observeAlert() = repeatOnStarted {
+        viewModel.alertMessage.observe {
+            showCustomAlert(it)
+        }
+    }
+
+    fun showCustomAlert(message: String) {
+        AlertDialog.Builder(requireContext())
+            .setMessage(message)
+            .setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
+            .create()
+            .show()
     }
 
     // binding. 을 생략하고 블록 안에서 객체 속성을 직접 접근할 수 있게

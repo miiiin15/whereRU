@@ -30,8 +30,19 @@ abstract class BaseViewModel<VE : ViewEvent> : ViewModel() {
     private val _loading = MutableStateFlow(false) // 로딩 상태를 나타내는 StateFlow
     val loading = _loading.asStateFlow() // 로딩 상태를 나타내는 StateFlow를 외부에서 접근할 수 있도록 함
 
+    private val _alertMessage = MutableStateFlow<String?>(null)
+    val alertMessage: StateFlow<String?> = _alertMessage
+
     private val _eventChannel: Channel<VE> = Channel() // ViewEvent를 전달하기 위한 Channel
     val eventFlow = _eventChannel.receiveAsFlow() // ViewEvent를 전달하기 위한 Channel을 외부에서 접근할 수 있도록 함
+
+    fun showAlert(message: String) {
+        _alertMessage.value = message
+    }
+
+    fun clearAlert() {
+        _alertMessage.value = null
+    }
 
     fun showLoading(tag: String = DEFAULT_LOADING_TAG) {
         if (loadingCountMap.values.sum() == 0) { // 로딩 상태가 0이면
@@ -63,6 +74,7 @@ abstract class BaseViewModel<VE : ViewEvent> : ViewModel() {
     fun handleError(throwable: Throwable?, tag: String) {
         throwable?.printStackTrace()
         hideLoading(tag)
+        showAlert(throwable?.message ?: "Unknown error")
         // TODO: 에러 처리 로직 추가 ex) log, toast, snackbar, etc.
     }
 
