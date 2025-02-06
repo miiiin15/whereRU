@@ -130,4 +130,12 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
+    <!-- 로딩 다이얼로그 스타일 -->
+    <style name="LoadingDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
 </resources>
