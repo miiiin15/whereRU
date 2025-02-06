@@ -14,13 +14,16 @@ import com.miiiin15.whereru.presentation.extension.observe
 import com.miiiin15.whereru.ui.extension.repeatOnStarted
 import kotlinx.coroutines.flow.StateFlow
 import com.miiiin15.whereru.ui.BR
+import com.miiiin15.whereru.ui.custom.LoadingDialog
 
 abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : ViewEvent>(
     @LayoutRes private val layoutResId: Int,
-):Fragment(){
+) : Fragment() {
     private var _binding: B? = null
     protected val binding: B
         get() = _binding ?: throw IllegalStateException("fragment destroyed!")
+
+    private val loadingDialog by lazy { LoadingDialog() }
 
     abstract val viewModel: VM
     abstract fun handleEvent(event: VE)
@@ -47,11 +50,19 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
             setVariable(BR.view, this@BaseFragment)
         }
         observeEvent()
+        observeLoading()
     }
 
     private fun observeEvent() = repeatOnStarted {
         viewModel.eventFlow
             .collect { handleEvent(it) }
+    }
+
+    private fun observeLoading() = repeatOnStarted {
+        viewModel.loading.observe { isLoading ->
+            if (isLoading) loadingDialog.show(childFragmentManager, null)
+            else loadingDialog.dismiss()
+        }
     }
 
     // binding. 을 생략하고 블록 안에서 객체 속성을 직접 접근할 수 있게
