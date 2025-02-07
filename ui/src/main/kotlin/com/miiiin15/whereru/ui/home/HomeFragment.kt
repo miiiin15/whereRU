@@ -33,6 +33,12 @@ class HomeFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding {
+            homeNavigateLocationButton.setOnClickListener {
+                findNavController().navigate(HomeFragmentDirections.actionHomeToLiveLocation())
+            }
+        }
     }
 
     override fun handleEvent(event: HomeViewModel.Event) {

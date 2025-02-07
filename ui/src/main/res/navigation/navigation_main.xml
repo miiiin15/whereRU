@@ -45,6 +45,19 @@
         android:label="homeFragment"
         tools:layout="@layout/fragment_home">
 
+        <action
+            android:id="@+id/action_home_to_liveLocation"
+            app:destination="@id/LiveLocationFragment"
+            app:popUpTo="@id/homeFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/LiveLocationFragment"
+        android:name="com.miiiin15.whereru.ui.location.LiveLocationFragment"
+        android:label="liveLocationFragment"
+        tools:layout="@layout/fragment_live_location">
+
     </fragment>
 
 

@@ -6,9 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class LocationViewModel @Inject constructor(
+class LiveLocationViewModel @Inject constructor(
     // TODO : UseCase 추가
-) : BaseViewModel<LocationViewModel.Event>() {
+) : BaseViewModel<LiveLocationViewModel.Event>() {
 
     sealed class Event : ViewEvent
 }
