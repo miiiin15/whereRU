@@ -11,11 +11,12 @@ import com.miiiin15.whereru.ui.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : BaseFragment<FragmentHomeBinding,HomeViewModel,HomeViewModel.Event>(R.layout.fragment_home) {
+class HomeFragment :
+    BaseFragment<FragmentHomeBinding, HomeViewModel, HomeViewModel.Event>(R.layout.fragment_home) {
     override val viewModel: HomeViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -26,7 +27,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeViewModel,HomeViewMode
                 }
             }
         )
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun handleEvent(event: HomeViewModel.Event) {
