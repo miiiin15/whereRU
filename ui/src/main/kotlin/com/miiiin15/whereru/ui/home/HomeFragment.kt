@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
@@ -18,7 +19,8 @@ class HomeFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     showCustomAlert("앱을 종료하시겠습니까?") {
