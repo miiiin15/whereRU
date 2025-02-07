@@ -21,11 +21,12 @@ class AuthFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel {
-            uid observe {
-                findNavController().navigate(AuthFragmentDirections.actionAuthToHome())
+            authState observe {
+                if (it)
+                    findNavController().navigate(AuthFragmentDirections.actionAuthToHome())
             }
         }
-        binding{
+        binding {
             vm = viewModel
         }
     }

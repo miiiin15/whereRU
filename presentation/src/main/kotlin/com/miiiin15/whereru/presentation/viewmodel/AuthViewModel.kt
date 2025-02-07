@@ -3,6 +3,7 @@ package com.miiiin15.whereru.presentation.viewmodel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.miiiin15.whereru.common.utils.AuthSessionManager
+import com.miiiin15.whereru.data_resource.collectDataResource
 import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.usecase.LoginUseCase
 import com.miiiin15.whereru.domain.usecase.RegisterUserUseCase
@@ -19,10 +20,10 @@ class AuthViewModel @Inject constructor(
     private val registerUserUseCase: RegisterUserUseCase
 ) : BaseViewModel<AuthViewModel.Event>() {
 
-    val authSessionManager = AuthSessionManager()
+    private val authSessionManager = AuthSessionManager()
 
-    private val _uid = MutableStateFlow<String>("")
-    val uid = _uid.asStateFlow()
+    private val _authState = MutableStateFlow(false)
+    val authState = _authState.asStateFlow()
 
     val email = MutableLiveData("")
     val password = MutableLiveData("")
@@ -41,28 +42,19 @@ class AuthViewModel @Inject constructor(
 
     fun register() {
         launch {
-            val result: String = registerUserUseCase(email.value!!, password.value!!)
-                .mapDataResource { it }
-                .await() ?: return@launch
-
-            if (!result.isNullOrBlank()) {
-                _uid.value = result
-                authSessionManager.login(result)
-            }
-
+            registerUserUseCase(email.value!!, password.value!!).collectDataResource({
+                _authState.value = true
+                authSessionManager.login(it)
+            })
         }
     }
 
     fun login() {
         launch {
-            val result: String = loginUseCase(email.value!!, password.value!!)
-                .mapDataResource { it }
-                .await() ?: return@launch
-
-            if (!result.isNullOrBlank()) {
-                _uid.value = result
-                authSessionManager.login(result)
-            }
+            loginUseCase(email.value!!, password.value!!).collectDataResource({
+                _authState.value = true
+                authSessionManager.login(it)
+            })
         }
     }
 
