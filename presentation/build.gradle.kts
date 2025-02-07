@@ -8,6 +8,7 @@ android {
 dependencies {
     implementation(projects.common)
     implementation(projects.domain)
+    implementation(projects.local)
     implementation(projects.dataResource)
 
     implementation(libs.androidx.viewmodel)

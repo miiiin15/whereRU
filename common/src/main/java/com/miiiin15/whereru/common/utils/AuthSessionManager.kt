@@ -1,8 +1,9 @@
 package com.miiiin15.whereru.common.utils
 
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class AuthSessionManager @Inject constructor() {
     private var uid: String? = null
         private set
