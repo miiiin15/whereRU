@@ -24,4 +24,8 @@ dependencies {
     kapt(libs.glide.compiler)
 
     implementation("kr.co.prnd:readmore-textview:1.0.0")
+
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+    implementation(libs.maps.ktx)
 }

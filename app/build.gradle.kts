@@ -10,12 +10,16 @@ android {
     namespace = "com.miiiin15.whereru"
     compileSdk = Config.compileSdk
 
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         applicationId = ApplicationId.id
         minSdk = Config.minSdk
         targetSdk = Config.targetSdk
         versionCode = Releases.versionCode
         versionName = Releases.versionName
+        manifestPlaceholders["MAPS_API_KEY"] = project.findProperty("MAPS_API_KEY") ?: "API key value is null"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
