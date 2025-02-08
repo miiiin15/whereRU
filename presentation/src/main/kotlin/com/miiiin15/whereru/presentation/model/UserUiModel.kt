@@ -6,7 +6,8 @@ import com.miiiin15.whereru.domain.model.User
 data class UserUiModel(
     val userId: String,
     val nickname: String,
-    val profileImageUrl: String?
+    val profileImageUrl: String?,
+    val lastLoginAt: Long
 )
 
-fun User.toPresentation() = UserUiModel(userId, nickname, profileImageUrl)
+fun User.toPresentation() = UserUiModel(userId, nickname, profileImageUrl, lastLoginAt)
