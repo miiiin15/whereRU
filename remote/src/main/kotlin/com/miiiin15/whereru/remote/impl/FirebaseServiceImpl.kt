@@ -1,13 +1,15 @@
 package com.miiiin15.whereru.remote.impl
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.miiiin15.whereru.remote.service.FirebaseService
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 
 class FirebaseServiceImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val firebaseDatabase: FirebaseDatabase
 ) : FirebaseService {
 
     override suspend fun login(email: String, password: String): String {
@@ -21,5 +23,6 @@ class FirebaseServiceImpl @Inject constructor(
             firebaseAuth.createUserWithEmailAndPassword(email, password).await().user!!.uid
         }.getOrElse { throw Exception("회원가입 실패: ${it.message}") }
     }
+
 }
 
