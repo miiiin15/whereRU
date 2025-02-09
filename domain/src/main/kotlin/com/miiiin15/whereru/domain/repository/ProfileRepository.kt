@@ -8,5 +8,6 @@ import kotlinx.coroutines.flow.Flow
 interface ProfileRepository {
     fun getProfile(userId: String): Flow<DataResource<User>>
     fun setProfile(user: User): Flow<DataResource<Unit>>
+    fun updateProfileSessionId(userId: String, sessionId:String): Flow<DataResource<Unit>>
     fun updateLastLogin(userId: String, lastLoginAt: Long): Flow<DataResource<Unit>>
 }

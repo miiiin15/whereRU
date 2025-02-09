@@ -25,6 +25,8 @@ interface FirebaseService {
 
     suspend fun getProfile(userId: String): ProfileEntity
 
+    suspend fun updateProfileSessionId(userId: String, sessionId: String): Unit
+
     suspend fun updateLastLogin(userId: String, lastLoginAt: Long): Unit
 
 }

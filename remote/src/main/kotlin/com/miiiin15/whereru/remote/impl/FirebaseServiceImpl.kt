@@ -79,6 +79,15 @@ class FirebaseServiceImpl @Inject constructor(
         }.getOrElse { throw Exception("프로필 조회 실패: ${it.message} ") }
     }
 
+    override suspend fun updateProfileSessionId(userId: String, sessionId: String) {
+        runCatching {
+            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
+                .document(userId)
+                .update("sessionId", sessionId)
+                .await()
+        }.getOrElse { throw Exception("세션 ID 갱신 실패 : ${it.message}") }
+    }
+
     override suspend fun updateLastLogin(userId: String, lastLoginAt: Long) {
         firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
             .document(userId)
