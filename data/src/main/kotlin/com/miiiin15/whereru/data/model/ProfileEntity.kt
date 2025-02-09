@@ -8,6 +8,7 @@ data class ProfileEntity(
     val userId: String = "",
     val nickname: String = "",
     val profileImageUrl: String? = "",
+    val sessionId: String? = "",
     val lastLoginAt: Long = 0
 ) : DataMapper<User> {
     override fun toDomain(): User {
@@ -15,6 +16,7 @@ data class ProfileEntity(
             userId = userId,
             nickname = nickname,
             profileImageUrl = profileImageUrl,
+            sessionId = sessionId,
             lastLoginAt = lastLoginAt
         )
     }

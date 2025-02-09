@@ -19,6 +19,7 @@ internal class ProfileRepositoryImpl @Inject constructor(
                     user.userId,
                     user.nickname,
                     user.profileImageUrl,
+                    user.sessionId,
                     user.lastLoginAt
                 )
             )

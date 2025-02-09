@@ -8,8 +8,17 @@ class SetProfileUseCase @Inject constructor(private val profileRepository: Profi
     operator fun invoke(
         userId: String,
         nickname: String,
-        profileImageUrl: String?,
+        profileImageUrl: String? = "",
+        sessionId: String? = "",
         lastLoginAt: Long
     ) =
-        profileRepository.setProfile(User(userId, nickname, profileImageUrl, lastLoginAt))
+        profileRepository.setProfile(
+            User(
+                userId,
+                nickname,
+                profileImageUrl,
+                sessionId,
+                lastLoginAt
+            )
+        )
 }
