@@ -18,4 +18,6 @@ class ProfileRemoteDataSourceImpl @Inject constructor(
     override suspend fun getProfile(userId: String): ProfileEntity =
         firebaseService.getProfile(userId)
 
+    override suspend fun updateLastLogin(userId: String, lastLoginAt: Long) =
+        firebaseService.updateLastLogin(userId, lastLoginAt)
 }

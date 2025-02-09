@@ -29,5 +29,10 @@ internal class ProfileRepositoryImpl @Inject constructor(
             profileRemoteDataSource.getProfile(userId)
         }
 
+    override fun updateLastLogin(userId: String, lastLoginAt: Long): Flow<DataResource<Unit>> =
+        flowDataResource {
+            profileRemoteDataSource.updateLastLogin(userId, lastLoginAt)
+        }
+
     // TODO : local과 연계
 }

@@ -8,4 +8,6 @@ interface ProfileRemoteDataSource {
 
     suspend fun getProfile(userId: String): ProfileEntity
 
+    suspend fun updateLastLogin(userId: String, lastLoginAt: Long): Unit
+
 }

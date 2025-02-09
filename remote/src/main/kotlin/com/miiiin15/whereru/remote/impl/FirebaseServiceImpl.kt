@@ -78,5 +78,12 @@ class FirebaseServiceImpl @Inject constructor(
                 .toObject(ProfileEntity::class.java)!!
         }.getOrElse { throw Exception("프로필 조회 실패: ${it.message} ") }
     }
+
+    override suspend fun updateLastLogin(userId: String, lastLoginAt: Long) {
+        firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
+            .document(userId)
+            .update("lastLoginAt", lastLoginAt)
+            .await()
+    }
 }
 
