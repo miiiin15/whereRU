@@ -7,6 +7,7 @@ android {
 }
 dependencies {
     implementation(projects.common)
+    implementation(projects.data)
     implementation(projects.domain)
     implementation(projects.local)
     implementation(projects.dataResource)
