@@ -97,7 +97,6 @@ class AuthViewModel @Inject constructor(
                         },
                         onError = {
                             hideLoading()
-                            showAlert("자동 로그인 실패: ${it.message}")
                             prefUtil.clearAuthInfoModel()
                         }
                     )
