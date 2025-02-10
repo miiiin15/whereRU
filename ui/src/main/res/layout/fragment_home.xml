@@ -142,7 +142,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_horizontal"
-            android:text="위치 요청" />
+            android:enabled="@{vm.fetched}"
+            android:text="내 위치 공유하기" />
 
 
     </LinearLayout>

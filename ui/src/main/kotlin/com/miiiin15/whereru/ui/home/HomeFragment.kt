@@ -1,5 +1,6 @@
 package com.miiiin15.whereru.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
@@ -19,6 +20,14 @@ class HomeFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        findNavController().addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.homeFragment) {
+                if (!viewModel.fetched.value!!) {
+                    viewModel.fetchProfile()
+                }
+            }
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
@@ -31,12 +40,22 @@ class HomeFragment :
         )
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding {
+            vm = viewModel
+
             homeNavigateLocationButton.setOnClickListener {
+                viewModel.fetched.value = false
                 findNavController().navigate(HomeFragmentDirections.actionHomeToLiveLocation())
+            }
+        }
+
+        viewModel {
+            myProfile observe { my ->
+                binding.homeTitleText.text = my.nickname
             }
         }
     }
