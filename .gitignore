@@ -108,3 +108,4 @@ proguard/
 /app/src/test/resources/
 /generated/
 /output.json
+.vscode/
