@@ -1,4 +1,4 @@
-package com.miiiin15.whereru.common.utils
+package com.miiiin15.whereru.data.utils
 
 import javax.inject.Inject
 import javax.inject.Singleton

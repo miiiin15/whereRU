@@ -1,6 +1,6 @@
-package com.miiiin15.whereru.common.di
+package com.miiiin15.whereru.data.di
 
-import com.miiiin15.whereru.common.utils.AuthSessionManager
+import com.miiiin15.whereru.data.utils.AuthSessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

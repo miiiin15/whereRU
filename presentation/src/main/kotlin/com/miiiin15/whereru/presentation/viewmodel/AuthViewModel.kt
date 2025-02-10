@@ -2,7 +2,7 @@ package com.miiiin15.whereru.presentation.viewmodel
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.miiiin15.whereru.common.utils.AuthSessionManager
+import com.miiiin15.whereru.data.utils.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.LoginUseCase
 import com.miiiin15.whereru.domain.usecase.RegisterUserUseCase
 import com.miiiin15.whereru.domain.usecase.SetProfileUseCase
