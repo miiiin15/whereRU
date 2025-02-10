@@ -6,8 +6,8 @@ import com.miiiin15.whereru.domain.model.User
 data class UserUiModel(
     val userId: String,
     val nickname: String,
-    val sessionId: String?,
     val profileImageUrl: String?,
+    val sessionId: String?,
     val lastLoginAt: Long
 )
 

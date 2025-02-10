@@ -1,13 +1,17 @@
 package com.miiiin15.whereru.presentation.viewmodel
 
 import androidx.lifecycle.MutableLiveData
+import com.miiiin15.whereru.common.utils.UUIDUtil
 import com.miiiin15.whereru.data.utils.AuthSessionManager
 import com.miiiin15.whereru.data_resource.mapDataResource
+import com.miiiin15.whereru.domain.usecase.CreateSessionUseCase
 import com.miiiin15.whereru.domain.usecase.GetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.model.toPresentation
+import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +20,13 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
+    private val createSessionUseCase: CreateSessionUseCase,
+    private val updateProfileSessionIdUseCase: UpdateProfileSessionIdUseCase,
     private val authSessionManager: AuthSessionManager,
 ) : BaseViewModel<HomeViewModel.Event>() {
+
+    private val _navigationTarget = MutableStateFlow<HomeNavigationTarget?>(null)
+    val navigationTarget = _navigationTarget.asStateFlow()
 
     private val _myProfile = MutableStateFlow<UserUiModel?>(null)
     val myProfile = _myProfile.asStateFlow()
@@ -29,10 +38,45 @@ class HomeViewModel @Inject constructor(
             getProfileUseCase(uid)
                 .mapDataResource { it.toPresentation() }
                 .collectDataResource({ profile ->
+                    authSessionManager.setSessionId(profile.sessionId)
                     _myProfile.value = profile
                     fetched.value = true
                 })
         }
+    }
+
+    // 세션 ID 체크 후 네비게이션 트리거
+    fun checkSessionID() {
+        launch {
+            if (authSessionManager.isEmptySessionId()) {
+                createSession()
+            }
+            _navigationTarget.value = HomeNavigationTarget.ToLiveLocation
+        }
+    }
+
+    // 세션 생성 - (성공 시)세션 ID 갱신
+    private suspend fun createSession() {
+        val userId = authSessionManager.getUid()
+        val uuid = UUIDUtil.generateSessionId()
+        createSessionUseCase(
+            uuid,
+            userId!!
+        ).collectDataResource({
+            updateSessionID(userId, uuid)
+        })
+    }
+
+    // 세션 ID 저장 및 갱신
+    private suspend fun updateSessionID(uid: String, sessionId: String) {
+        updateProfileSessionIdUseCase(uid, sessionId).await()
+        authSessionManager.setSessionId(sessionId)
+    }
+
+    // 트리거 정리
+    fun clearTrigger() {
+        _navigationTarget.value = null
+        fetched.value = false
     }
 
     sealed class Event : ViewEvent
