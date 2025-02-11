@@ -8,4 +8,5 @@ android{
 
 dependencies{
     implementation(libs.gson)
+    implementation(libs.play.services.location.v2101)
 }
