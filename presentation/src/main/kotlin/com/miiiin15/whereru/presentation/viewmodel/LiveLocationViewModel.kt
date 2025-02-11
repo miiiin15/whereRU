@@ -52,8 +52,7 @@ class LiveLocationViewModel @Inject constructor(
             _myProfile.value?.nickname.let {
                 updateMyLocationUseCase(
                     authSessionManager.targetSessionId!!,
-//                    authSessionManager.uid!!,
-                    "7f9d3e12a47c48bfb2c31a90d9ba",
+                    authSessionManager.uid!!,
                     _myProfile.value!!.nickname,
                     location
                 ).collectDataResource(
