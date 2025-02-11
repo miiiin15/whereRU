@@ -1,6 +1,6 @@
 package com.miiiin15.whereru.presentation.viewmodel
 
-import com.miiiin15.whereru.data.utils.AuthSessionManager
+import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +12,7 @@ class AppViewModel @Inject constructor(
 ) : BaseViewModel<AppViewModel.Event>() {
 
     init {
-        authSessionManager.logout()
+        authSessionManager.clear()
     }
 
     sealed class Event : ViewEvent

@@ -2,8 +2,8 @@ package com.miiiin15.whereru.presentation.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import com.miiiin15.whereru.common.utils.UUIDUtil
-import com.miiiin15.whereru.data.utils.AuthSessionManager
 import com.miiiin15.whereru.data_resource.mapDataResource
+import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.CreateSessionUseCase
 import com.miiiin15.whereru.domain.usecase.GetProfileUseCase
 import com.miiiin15.whereru.domain.usecase.UpdateProfileSessionIdUseCase
@@ -34,7 +34,7 @@ class HomeViewModel @Inject constructor(
     val fetched = MutableLiveData<Boolean>(false)
 
     fun fetchProfile() = launch {
-        authSessionManager.getUid()?.let { uid ->
+        authSessionManager.uid?.let { uid ->
             getProfileUseCase(uid)
                 .mapDataResource { it.toPresentation() }
                 .collectDataResource({ profile ->
@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor(
 
     // 세션 생성 - (성공 시)세션 ID 갱신
     private suspend fun createSession() {
-        val userId = authSessionManager.getUid()
+        val userId = authSessionManager.uid
         val uuid = UUIDUtil.generateSessionId()
         createSessionUseCase(
             uuid,
