@@ -38,7 +38,7 @@ class HomeViewModel @Inject constructor(
             getProfileUseCase(uid)
                 .mapDataResource { it.toPresentation() }
                 .collectDataResource({ profile ->
-                    authSessionManager.setSessionId(profile.sessionId)
+                    authSessionManager.setTargetSessionId(profile.sessionId)
                     _myProfile.value = profile
                     fetched.value = true
                 })
@@ -48,7 +48,7 @@ class HomeViewModel @Inject constructor(
     // 세션 ID 체크 후 네비게이션 트리거
     fun checkSessionID() {
         launch {
-            if (authSessionManager.isEmptySessionId()) {
+            if (authSessionManager.isEmptyTargetSessionId()) {
                 createSession()
             }
             _navigationTarget.value = HomeNavigationTarget.ToLiveLocation
@@ -70,7 +70,7 @@ class HomeViewModel @Inject constructor(
     // 세션 ID 저장 및 갱신
     private suspend fun updateSessionID(uid: String, sessionId: String) {
         updateProfileSessionIdUseCase(uid, sessionId).await()
-        authSessionManager.setSessionId(sessionId)
+        authSessionManager.setTargetSessionId(sessionId)
     }
 
     // 트리거 정리
