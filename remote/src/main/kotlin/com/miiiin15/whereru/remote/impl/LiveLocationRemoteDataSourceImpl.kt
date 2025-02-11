@@ -1,6 +1,6 @@
 package com.miiiin15.whereru.remote.impl
 
-import com.miiiin15.whereru.data.model.UserLocationEntity
+import com.miiiin15.whereru.data.model.MyLocationEntity
 import com.miiiin15.whereru.data.remote.LiveLocationRemoteDataSource
 import com.miiiin15.whereru.remote.service.FirebaseService
 import javax.inject.Inject
@@ -13,7 +13,7 @@ class LiveLocationRemoteDataSourceImpl @Inject constructor(
         sessionId: String,
         userId: String,
         nickname: String,
-        location: UserLocationEntity
+        location: MyLocationEntity
     ): Unit =
         firebaseService.updateMyLocation(sessionId, userId, nickname, location)
 }

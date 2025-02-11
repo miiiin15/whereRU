@@ -1,6 +1,6 @@
 package com.miiiin15.whereru.data.remote
 
-import com.miiiin15.whereru.data.model.UserLocationEntity
+import com.miiiin15.whereru.data.model.MyLocationEntity
 
 
 interface LiveLocationRemoteDataSource {
@@ -9,7 +9,7 @@ interface LiveLocationRemoteDataSource {
         sessionId: String,
         userId: String,
         nickname: String,
-        location: UserLocationEntity
+        location: MyLocationEntity
     ): Unit
 
 }

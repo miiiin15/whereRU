@@ -1,7 +1,7 @@
 package com.miiiin15.whereru.presentation.model
 
 import com.miiiin15.whereru.common.location.model.RawLocation
-import com.miiiin15.whereru.domain.model.LocationData
+import com.miiiin15.whereru.domain.model.MyLocationData
 
 data class LocationUiModel(
     val latitude: Double,  // 위도
@@ -9,5 +9,5 @@ data class LocationUiModel(
     val timestamp: Long    // 위치 업데이트 시간
 )
 
-fun LocationData.toPresentation() = LocationUiModel(latitude, longitude, timestamp)
+fun MyLocationData.toPresentation() = LocationUiModel(latitude, longitude, timestamp)
 fun RawLocation.toPresentation() = LocationUiModel(latitude, longitude, timestamp)

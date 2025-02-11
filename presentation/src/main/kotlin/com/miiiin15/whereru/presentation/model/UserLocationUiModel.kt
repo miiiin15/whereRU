@@ -15,7 +15,7 @@ fun UserLocation.toPresentation() =
     UserLocationUiModel(
         userId,
         nickname,
-        locationData.latitude,
-        locationData.longitude,
-        locationData.timestamp
+        myLocationData.latitude,
+        myLocationData.longitude,
+        myLocationData.timestamp
     )

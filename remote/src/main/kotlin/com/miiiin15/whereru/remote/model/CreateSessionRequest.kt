@@ -1,7 +1,7 @@
 package com.miiiin15.whereru.remote.model
 
 import com.google.firebase.database.PropertyName
-import com.miiiin15.whereru.data.model.UserLocationEntity
+import com.miiiin15.whereru.data.model.MyLocationEntity
 
 data class CreateSessionRequest(
 
@@ -17,6 +17,6 @@ data class CreateSessionRequest(
     @set:PropertyName("is_active")
     var isActive: Boolean = true,
 
-    var users: Map<String, UserLocationEntity> = emptyMap()
+    var users: Map<String, MyLocationEntity> = emptyMap()
 )
 

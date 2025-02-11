@@ -1,7 +1,7 @@
 package com.miiiin15.whereru.remote.service
 
 import com.miiiin15.whereru.data.model.ProfileEntity
-import com.miiiin15.whereru.data.model.UserLocationEntity
+import com.miiiin15.whereru.data.model.MyLocationEntity
 
 
 interface FirebaseService {
@@ -16,7 +16,7 @@ interface FirebaseService {
         sessionId: String,
         uid: String,
         nickname: String,
-        location: UserLocationEntity
+        location: MyLocationEntity
     ): Unit
 
     suspend fun setProfile(

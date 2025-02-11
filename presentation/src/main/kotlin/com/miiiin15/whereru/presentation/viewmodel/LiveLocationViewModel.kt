@@ -2,7 +2,7 @@ package com.miiiin15.whereru.presentation.viewmodel
 
 import com.miiiin15.whereru.common.location.LocationTracker
 import com.miiiin15.whereru.data_resource.mapDataResource
-import com.miiiin15.whereru.domain.model.LocationData
+import com.miiiin15.whereru.domain.model.MyLocationData
 import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.GetProfileUseCase
 import com.miiiin15.whereru.domain.usecase.UpdateMyLocationUseCase
@@ -47,12 +47,13 @@ class LiveLocationViewModel @Inject constructor(
     }
 
     // 세션에 위치 정보 업데이트
-    fun updateMyLocation(location: LocationData) {
+    fun updateMyLocation(location: MyLocationData) {
         launch {
             _myProfile.value?.nickname.let {
                 updateMyLocationUseCase(
                     authSessionManager.targetSessionId!!,
-                    authSessionManager.uid!!,
+//                    authSessionManager.uid!!,
+                    "7f9d3e12a47c48bfb2c31a90d9ba",
                     _myProfile.value!!.nickname,
                     location
                 ).collectDataResource(
@@ -67,7 +68,7 @@ class LiveLocationViewModel @Inject constructor(
     fun startTrackingMyLocation() {
         locationTracker.startTracking { location ->
             updateMyLocation(
-                LocationData(
+                MyLocationData(
                     location.latitude,
                     location.longitude,
                     location.timestamp

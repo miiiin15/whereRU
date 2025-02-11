@@ -4,9 +4,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.miiiin15.whereru.data.model.ProfileEntity
-import com.miiiin15.whereru.data.model.UserLocationEntity
+import com.miiiin15.whereru.data.model.MyLocationEntity
 import com.miiiin15.whereru.remote.model.CreateSessionRequest
-import com.miiiin15.whereru.remote.model.UserLocationRequest
+import com.miiiin15.whereru.remote.model.MyLocationRequest
 import com.miiiin15.whereru.remote.service.FirebaseService
 import com.miiiin15.whereru.remote.utils.FirebasePaths
 import kotlinx.coroutines.tasks.await
@@ -35,16 +35,16 @@ class FirebaseServiceImpl @Inject constructor(
         sessionId: String,
         uid: String,
         nickname: String,
-        location: UserLocationEntity
+        location: MyLocationEntity
     ): Unit {
 
-        val userLocation = UserLocationRequest(
+        val myLocation = MyLocationRequest(
             nickname = nickname,
             location = location
         )
 
         firebaseDatabase.getReference("${FirebasePaths.LOCATION_SESSIONS}/$sessionId/users/$uid")
-            .setValue(userLocation)
+            .setValue(myLocation)
             .await()
     }
 
