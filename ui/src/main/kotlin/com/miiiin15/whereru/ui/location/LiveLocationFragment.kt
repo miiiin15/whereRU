@@ -1,5 +1,6 @@
 package com.miiiin15.whereru.ui.location
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -13,12 +14,13 @@ import com.miiiin15.whereru.presentation.viewmodel.LiveLocationViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
 import com.miiiin15.whereru.ui.databinding.FragmentLiveLocationBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class LiveLocationFragment :
     BaseFragment<FragmentLiveLocationBinding, LiveLocationViewModel, LiveLocationViewModel.Event>(
         R.layout.fragment_live_location
-    ),OnMapReadyCallback {
+    ), OnMapReadyCallback {
     override val viewModel: LiveLocationViewModel by viewModels()
 
 
@@ -32,13 +34,51 @@ class LiveLocationFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.startTrackingMyLocation()
+
+        viewModel {
+            myLocation observe {
+                mMap.let {
+                    mMap!!.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(myLocation.value!!.latitude, myLocation.value!!.longitude),
+                            18f
+                        )
+                    )
+                }
+            }
+        }
+
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.stopTrackingMyLocation()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.currentMyLocation()
+    }
+
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        mMap!!.mapType = GoogleMap.MAP_TYPE_NORMAL
+        mMap!!.isMyLocationEnabled = true
+
+        with(mMap!!.uiSettings) {
+            isZoomControlsEnabled = true
+            isCompassEnabled = true
+            isMyLocationButtonEnabled = true
+            isMapToolbarEnabled = true
+            isScrollGesturesEnabled = true
+            isZoomGesturesEnabled = true
+        }
         val SEOUL = LatLng(37.556, 126.97)
 
         val markerOptions = MarkerOptions()
