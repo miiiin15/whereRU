@@ -22,6 +22,7 @@ class FusedLocationTracker @Inject constructor(
 
     @SuppressLint("MissingPermission")
     override fun startTracking(onLocationUpdated: (RawLocation) -> Unit) {
+        println("🏁Start Location Tracking🏁")
         val intervalValue = 5000L
         val fastIntervalValue = 2000L
         val maxWaitTimeValue = 10000L
@@ -89,6 +90,7 @@ class FusedLocationTracker @Inject constructor(
     }
 
     override fun stopTracking() {
+        println("🛑Stop Location Tracking🛑")
         callback?.let { fusedClient.removeLocationUpdates(it) }
     }
 }
