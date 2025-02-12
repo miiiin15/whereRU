@@ -12,7 +12,7 @@ data class LocationSessionUiModel(
 
 // TODO : UI상에 어떤 시간을 표기 할건지 고려하기
 
-fun LiveLocationSession.toPresentation() {
+fun LiveLocationSession.toPresentation(): LocationSessionUiModel {
     val timeValue: String = startedAt.toString()
-    LocationSessionUiModel(hostId, isActive, startedAt.toString())
+    return LocationSessionUiModel(hostId, isActive, startedAt.toString())
 }
