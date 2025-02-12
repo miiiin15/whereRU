@@ -23,19 +23,22 @@ class MarkerManager(
 
         users.forEach { (userId, user) ->
             val newPosition = LatLng(user.location.latitude, user.location.longitude)
-            if (markers.containsKey(userId)) {
+            val newTime = user.location.timestamp
+            if (markers.containsKey(userId)) { // 좌표가 동일한 기존 마커가 있는 경우
                 val marker = markers[userId]
                 if (marker?.position != newPosition) {
                     animateMarkerTo(marker, newPosition)
                 }
+                marker?.snippet = newTime
                 newMarkers[userId] = marker!!
-            } else {
+            } else { // 좌표가 다른 새로운 마커인 경우
                 val bitmap = BitmapFactory.decodeResource(resources, R.drawable.profile_image_default)
                 val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, false)
                 val marker = mMap?.addMarker(
                     MarkerOptions()
                         .position(newPosition)
                         .title(user.nickname)
+                        .snippet(newTime)
                         .icon(BitmapDescriptorFactory.fromBitmap(scaledBitmap))
                 )
                 if (marker != null) {
