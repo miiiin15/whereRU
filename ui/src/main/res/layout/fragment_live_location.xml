@@ -14,14 +14,49 @@
             type="com.miiiin15.whereru.presentation.viewmodel.LiveLocationViewModel" />
 
     </data>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        />
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:orientation="vertical"
+            android:layout_marginBottom="36dp"
+            android:paddingHorizontal="8dp">
+
+            <Switch
+                android:id="@+id/live_location_transmit_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#90FFFFFF"
+                android:checked="@{vm.isWantTransmit}"
+                android:padding="10dp"
+                android:text="공유 하기"
+                android:textSize="@dimen/text_size_small"
+                android:layout_marginBottom="@dimen/spacing_input_field"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+            <Switch
+                android:id="@+id/live_location_receive_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#90FFFFFF"
+                android:checked="@{vm.isWantReceive()}"
+                android:padding="10dp"
+                android:text="공유 받기"
+                android:textSize="@dimen/text_size_small"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+        </LinearLayout>
+
     </FrameLayout>
 </layout>

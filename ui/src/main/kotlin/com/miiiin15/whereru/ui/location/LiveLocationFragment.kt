@@ -1,6 +1,7 @@
 package com.miiiin15.whereru.ui.location
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -34,8 +35,6 @@ class LiveLocationFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.startTrackingMyLocation()
-
         viewModel {
             myLocation observe {
                 mMap.let {
@@ -47,6 +46,30 @@ class LiveLocationFragment :
                     )
                 }
             }
+
+            isWantReceive observe { isChecked ->
+                val color = if (isChecked) "#90FFFFFF" else "#80AAAAAA"
+                binding.liveLocationReceiveSwitch.setBackgroundColor(Color.parseColor(color))
+            }
+
+            isWantTransmit observe { isChecked ->
+                val color = if (isChecked) "#90FFFFFF" else "#80AAAAAA"
+                binding.liveLocationTransmitSwitch.setBackgroundColor(Color.parseColor(color))
+            }
+        }
+
+        binding {
+            vm = viewModel
+
+            liveLocationTransmitSwitch.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.setTrackingState(isChecked)
+            }
+
+            liveLocationReceiveSwitch.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.setObserveSessionState(isChecked)
+            }
+
+
         }
 
         val mapFragment = childFragmentManager
@@ -56,7 +79,8 @@ class LiveLocationFragment :
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.stopTrackingMyLocation()
+        viewModel.setObserveSessionState(false)
+        viewModel.setTrackingState(false)
     }
 
     override fun onResume() {
@@ -73,11 +97,12 @@ class LiveLocationFragment :
 
         with(mMap!!.uiSettings) {
             isZoomControlsEnabled = true
-            isCompassEnabled = true
+            isCompassEnabled = false
             isMyLocationButtonEnabled = true
             isMapToolbarEnabled = true
             isScrollGesturesEnabled = true
             isZoomGesturesEnabled = true
+            isRotateGesturesEnabled = false
         }
         val SEOUL = LatLng(37.556, 126.97)
 

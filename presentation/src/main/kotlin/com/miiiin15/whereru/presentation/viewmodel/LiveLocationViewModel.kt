@@ -34,6 +34,12 @@ class LiveLocationViewModel @Inject constructor(
     private val _myLocation = MutableStateFlow<LocationUiModel?>(null)
     val myLocation = _myLocation.asStateFlow()
 
+    private val _isWantTransmit = MutableStateFlow(true)
+    val isWantTransmit = _isWantTransmit.asStateFlow()
+
+    private val _isWantReceive = MutableStateFlow(true)
+    val isWantReceive = _isWantReceive.asStateFlow()
+
 
     init {
         fetchProfile()
@@ -50,25 +56,55 @@ class LiveLocationViewModel @Inject constructor(
         }
     }
 
-    fun stopObserveLiveSession() = launch {
-        stopObserveSessionUseCase(authSessionManager.targetSessionId!!)
-            .collectDataResource({
-                // TODO : 취소 이후 로직
-            })
+
+    // 세션 정보 구독 시작, 중지
+    fun setObserveSessionState(isObserving: Boolean) {
+        val sessionId = authSessionManager.targetSessionId!!
+
+        if (isObserving) { // 시작
+            _isWantReceive.value = true
+            launch {
+                observeSessionUseCase(
+                    sessionId,
+                    onSessionUpdated = {
+                        if (!_isWantReceive.value) {
+                            setObserveSessionState(false)
+                        }
+                        // TODO : 세션 정보 받은 후 로직
+                    },
+                    onError = { showAlert("${it.message}") }
+                )
+            }
+        } else { // 중지
+            launch {
+                stopObserveSessionUseCase(sessionId).await()
+                        _isWantReceive.value = false
+            }
+        }
     }
 
-    fun startObserveLiveSession() = launch {
-        observeSessionUseCase(
-            authSessionManager.targetSessionId!!,
-            onSessionUpdated = {
-                // TODO : 성공 로직
-            },
-            onError = { showAlert("${it.message}") }
-        )
+    // 트래킹 시작, 중단
+    fun setTrackingState(isTracking: Boolean) {
+        _isWantTransmit.value = isTracking
+
+        if (isTracking) { // 시작
+            locationTracker.startTracking { location ->
+                updateMyLocation(
+                    MyLocationData(
+                        location.latitude,
+                        location.longitude,
+                        location.timestamp
+                    )
+                )
+            }
+        } else { // 중지
+            locationTracker.stopTracking()
+        }
     }
 
-    // 세션에 위치 정보 업데이트
-    fun updateMyLocation(location: MyLocationData) {
+    // 세션에 내 위치 정보 업로드
+    private fun updateMyLocation(location: MyLocationData) {
+        if (!_isWantTransmit.value) return
         launch {
             _myProfile.value?.nickname.let {
                 updateMyLocationUseCase(
@@ -84,19 +120,6 @@ class LiveLocationViewModel @Inject constructor(
         }
     }
 
-    // 트래킹 시작
-    fun startTrackingMyLocation() {
-        locationTracker.startTracking { location ->
-            updateMyLocation(
-                MyLocationData(
-                    location.latitude,
-                    location.longitude,
-                    location.timestamp
-                )
-            )
-        }
-    }
-
     // 단발성 위치 추적
     fun currentMyLocation() {
         launch {
@@ -107,14 +130,10 @@ class LiveLocationViewModel @Inject constructor(
         }
     }
 
-    // 트래킹 중단
-    fun stopTrackingMyLocation() {
-        locationTracker.stopTracking()
-    }
-
     override fun onCleared() {
         super.onCleared()
-        stopTrackingMyLocation()
+        setObserveSessionState(false)
+        setTrackingState(false)
     }
 
     sealed class Event : ViewEvent
