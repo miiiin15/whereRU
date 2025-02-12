@@ -10,6 +10,8 @@ import com.miiiin15.whereru.domain.usecase.StopObserveSessionUseCase
 import com.miiiin15.whereru.domain.usecase.UpdateMyLocationUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
+import com.miiiin15.whereru.presentation.model.LiveLocationUserUiModel
+import com.miiiin15.whereru.presentation.model.LocationSessionUiModel
 import com.miiiin15.whereru.presentation.model.LocationUiModel
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.model.toPresentation
@@ -40,6 +42,11 @@ class LiveLocationViewModel @Inject constructor(
     private val _isWantReceive = MutableStateFlow(true)
     val isWantReceive = _isWantReceive.asStateFlow()
 
+    private val _sessionInfo = MutableStateFlow<LocationSessionUiModel?>(null)
+    val sessionInfo = _sessionInfo.asStateFlow()
+
+    private val _users = MutableStateFlow<Map<String, LiveLocationUserUiModel>>(emptyMap())
+    val users = _users.asStateFlow()
 
     init {
         fetchProfile()
@@ -56,38 +63,41 @@ class LiveLocationViewModel @Inject constructor(
         }
     }
 
-
-    // 세션 정보 구독 시작, 중지
     fun setObserveSessionState(isObserving: Boolean) {
         val sessionId = authSessionManager.targetSessionId!!
 
-        if (isObserving) { // 시작
+        if (isObserving) {
             _isWantReceive.value = true
             launch {
                 observeSessionUseCase(
                     sessionId,
-                    onSessionUpdated = {
+                    onSessionUpdated = { session ->
                         if (!_isWantReceive.value) {
                             setObserveSessionState(false)
                         }
-                        // TODO : 세션 정보 받은 후 로직
+
+                        _sessionInfo.value = session.toPresentation()
+                        val newUsers = session.users
+                            .filterKeys { it != authSessionManager.uid }
+                            .mapValues { entry -> entry.value.toPresentation() }
+                        _users.value = newUsers
+                        event(Event.UsersUpdated(newUsers))
                     },
                     onError = { showAlert("${it.message}") }
                 )
             }
-        } else { // 중지
+        } else {
             launch {
                 stopObserveSessionUseCase(sessionId).await()
-                        _isWantReceive.value = false
+                _isWantReceive.value = false
             }
         }
     }
 
-    // 트래킹 시작, 중단
     fun setTrackingState(isTracking: Boolean) {
         _isWantTransmit.value = isTracking
 
-        if (isTracking) { // 시작
+        if (isTracking) {
             locationTracker.startTracking { location ->
                 updateMyLocation(
                     MyLocationData(
@@ -97,12 +107,11 @@ class LiveLocationViewModel @Inject constructor(
                     )
                 )
             }
-        } else { // 중지
+        } else {
             locationTracker.stopTracking()
         }
     }
 
-    // 세션에 내 위치 정보 업로드
     private fun updateMyLocation(location: MyLocationData) {
         if (!_isWantTransmit.value) return
         launch {
@@ -120,7 +129,6 @@ class LiveLocationViewModel @Inject constructor(
         }
     }
 
-    // 단발성 위치 추적
     fun currentMyLocation() {
         launch {
             val loc = locationTracker.getCurrentLocation()
@@ -136,5 +144,7 @@ class LiveLocationViewModel @Inject constructor(
         setTrackingState(false)
     }
 
-    sealed class Event : ViewEvent
+    sealed class Event : ViewEvent{
+        data class UsersUpdated(val users: Map<String, LiveLocationUserUiModel>) : Event()
+    }
 }
