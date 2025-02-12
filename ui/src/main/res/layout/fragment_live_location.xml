@@ -28,21 +28,43 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/padding_horizontal">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/profile_image_default" />
+
+            <TextView
+                android:id="@+id/live_location_marker_count_text"
+                style="@style/Subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
-            android:orientation="vertical"
             android:layout_marginBottom="36dp"
+            android:orientation="vertical"
             android:paddingHorizontal="8dp">
 
             <Switch
                 android:id="@+id/live_location_transmit_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_input_field"
                 android:background="#90FFFFFF"
                 android:checked="@{vm.isWantTransmit}"
                 android:padding="10dp"
                 android:text="공유 하기"
                 android:textSize="@dimen/text_size_small"
-                android:layout_marginBottom="@dimen/spacing_input_field"
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
 
             <Switch

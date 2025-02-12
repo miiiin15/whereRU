@@ -40,6 +40,7 @@ class LiveLocationFragment :
         viewModel {
             users observe { users ->
                 updateMarkers(users)
+                binding.liveLocationMarkerCountText.text = "${users.size}"
             }
             myLocation observe {
                 if (!isCameraMoved && myLocation.value != null) {
