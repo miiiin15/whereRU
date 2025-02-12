@@ -5,6 +5,8 @@ import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.model.MyLocationData
 import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.GetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.ObserveSessionUseCase
+import com.miiiin15.whereru.domain.usecase.StopObserveSessionUseCase
 import com.miiiin15.whereru.domain.usecase.UpdateMyLocationUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
@@ -20,6 +22,8 @@ import javax.inject.Inject
 class LiveLocationViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val updateMyLocationUseCase: UpdateMyLocationUseCase,
+    private val observeSessionUseCase: ObserveSessionUseCase,
+    private val stopObserveSessionUseCase: StopObserveSessionUseCase,
     private val locationTracker: LocationTracker,
     private val authSessionManager: AuthSessionManager,
 ) : BaseViewModel<LiveLocationViewModel.Event>() {
@@ -44,6 +48,23 @@ class LiveLocationViewModel @Inject constructor(
                     _myProfile.value = profile
                 })
         }
+    }
+
+    fun stopObserveLiveSession() = launch {
+        stopObserveSessionUseCase(authSessionManager.targetSessionId!!)
+            .collectDataResource({
+                // TODO : 취소 이후 로직
+            })
+    }
+
+    fun startObserveLiveSession() = launch {
+        observeSessionUseCase(
+            authSessionManager.targetSessionId!!,
+            onSessionUpdated = {
+                // TODO : 성공 로직
+            },
+            onError = { showAlert("${it.message}") }
+        )
     }
 
     // 세션에 위치 정보 업데이트
@@ -88,7 +109,6 @@ class LiveLocationViewModel @Inject constructor(
 
     // 트래킹 중단
     fun stopTrackingMyLocation() {
-        println("❌트래커 중지")
         locationTracker.stopTracking()
     }
 

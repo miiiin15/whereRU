@@ -2,6 +2,7 @@ package com.miiiin15.whereru.remote.service
 
 import com.miiiin15.whereru.data.model.ProfileEntity
 import com.miiiin15.whereru.data.model.MyLocationEntity
+import com.miiiin15.whereru.remote.model.LiveLocationResponse
 
 
 interface FirebaseService {
@@ -28,5 +29,13 @@ interface FirebaseService {
     suspend fun updateProfileSessionId(userId: String, sessionId: String): Unit
 
     suspend fun updateLastLogin(userId: String, lastLoginAt: Long): Unit
+
+    fun observeSession(
+        sessionId: String,
+        onSessionUpdated: (LiveLocationResponse) -> Unit,
+        onError: (Throwable) -> Unit = {}
+    ): Unit
+
+    suspend fun stopObserveSession(sessionId: String): Unit
 
 }
