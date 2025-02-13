@@ -72,11 +72,13 @@ class FirebaseServiceImpl @Inject constructor(
             .await()
     }
 
-    override suspend fun setProfile(profile: ProfileEntity): Unit {
-        firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
-            .document(profile.userId)
-            .set(profile)
-            .await()
+    override suspend fun getAllProfiles(): List<ProfileEntity> {
+        return runCatching {
+            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
+                .get()
+                .await()
+                .toObjects(ProfileEntity::class.java)
+        }.getOrElse { throw Exception("프로필 조회 실패: ${it.message}") }
     }
 
     override suspend fun getProfile(userId: String): ProfileEntity {
@@ -87,6 +89,13 @@ class FirebaseServiceImpl @Inject constructor(
                 .await()
                 .toObject(ProfileEntity::class.java)!!
         }.getOrElse { throw Exception("프로필 조회 실패: ${it.message} ") }
+    }
+
+    override suspend fun setProfile(profile: ProfileEntity): Unit {
+        firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
+            .document(profile.userId)
+            .set(profile)
+            .await()
     }
 
     override suspend fun updateProfileSessionId(userId: String, sessionId: String) {

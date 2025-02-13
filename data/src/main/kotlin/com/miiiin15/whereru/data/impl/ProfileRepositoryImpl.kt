@@ -12,6 +12,17 @@ import javax.inject.Inject
 internal class ProfileRepositoryImpl @Inject constructor(
     private val profileRemoteDataSource: ProfileRemoteDataSource,
 ) : ProfileRepository {
+
+    override fun getAllProfiles(): Flow<DataResource<List<User>>> =
+        flowDataResource {
+            profileRemoteDataSource.getAllProfiles()
+        }
+
+    override fun getProfile(userId: String): Flow<DataResource<User>> =
+        flowDataResource {
+            profileRemoteDataSource.getProfile(userId)
+        }
+
     override fun setProfile(user: User): Flow<DataResource<Unit>> =
         flowDataResource {
             profileRemoteDataSource.setProfile(
@@ -23,11 +34,6 @@ internal class ProfileRepositoryImpl @Inject constructor(
                     user.lastLoginAt
                 )
             )
-        }
-
-    override fun getProfile(userId: String): Flow<DataResource<User>> =
-        flowDataResource {
-            profileRemoteDataSource.getProfile(userId)
         }
 
     override fun updateProfileSessionId(

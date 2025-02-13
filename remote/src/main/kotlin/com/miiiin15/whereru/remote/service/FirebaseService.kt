@@ -20,11 +20,13 @@ interface FirebaseService {
         location: MyLocationEntity
     ): Unit
 
+    suspend fun getAllProfiles(): List<ProfileEntity>
+
+    suspend fun getProfile(userId: String): ProfileEntity
+
     suspend fun setProfile(
         profile: ProfileEntity
     ): Unit
-
-    suspend fun getProfile(userId: String): ProfileEntity
 
     suspend fun updateProfileSessionId(userId: String, sessionId: String): Unit
 

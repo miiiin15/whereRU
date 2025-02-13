@@ -9,12 +9,15 @@ class ProfileRemoteDataSourceImpl @Inject constructor(
     private val firebaseService: FirebaseService
 ) : ProfileRemoteDataSource {
 
-    override suspend fun setProfile(
-        profile: ProfileEntity
-    ) = firebaseService.setProfile(profile)
+    override suspend fun getAllProfiles(): List<ProfileEntity> =
+        firebaseService.getAllProfiles()
 
     override suspend fun getProfile(userId: String): ProfileEntity =
         firebaseService.getProfile(userId)
+
+    override suspend fun setProfile(
+        profile: ProfileEntity
+    ) = firebaseService.setProfile(profile)
 
     override suspend fun updateProfileSessionId(userId: String, sessionId: String) =
         firebaseService.updateProfileSessionId(userId, sessionId)
