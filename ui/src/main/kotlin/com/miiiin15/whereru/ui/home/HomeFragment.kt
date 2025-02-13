@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -144,8 +145,19 @@ class HomeFragment :
 
         override fun getItemCount(): Int = 3
 
-        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+       inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             private val recyclerView: RecyclerView = view.findViewById(R.id.home_list_recycler)
+            private val emptyView: LinearLayout = view.findViewById(R.id.home_list_empty_view)
+
+            private fun checkDataIsNullOrEmpty(data: List<Any>?) {
+                if (data.isNullOrEmpty()) {
+                    recyclerView.visibility = View.GONE
+                    emptyView.visibility = View.VISIBLE
+                } else {
+                    recyclerView.visibility = View.VISIBLE
+                    emptyView.visibility = View.GONE
+                }
+            }
 
             fun bind(position: Int) {
                 recyclerView.layoutManager = LinearLayoutManager(itemView.context)
@@ -153,6 +165,7 @@ class HomeFragment :
                     0 -> {
                         recyclerView.adapter = sessionListAdapter
                         viewModel.sessionList.observe { data ->
+                            checkDataIsNullOrEmpty(data)
                             sessionListAdapter.resetAll(data)
                         }
                     }
@@ -160,6 +173,7 @@ class HomeFragment :
                     1 -> {
                         recyclerView.adapter = userListAdapter
                         viewModel.userList.observe { data ->
+                            checkDataIsNullOrEmpty(data)
                             userListAdapter.resetAll(data)
                         }
                     }
@@ -167,6 +181,7 @@ class HomeFragment :
                     2 -> {
                         recyclerView.adapter = friendListAdapter
                         viewModel.friendList.observe { data ->
+                            checkDataIsNullOrEmpty(data)
                             friendListAdapter.resetAll(data)
                         }
                     }
