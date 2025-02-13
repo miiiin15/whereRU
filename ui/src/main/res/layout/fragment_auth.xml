@@ -19,7 +19,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/padding_horizontal"
+        android:paddingHorizontal="@dimen/padding_horizontal"
         tools:context=".ui.auth.AuthFragment">
 
         <!-- 로그인 타이틀 -->

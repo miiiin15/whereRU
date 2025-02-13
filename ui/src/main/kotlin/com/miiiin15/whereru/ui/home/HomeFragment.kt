@@ -90,7 +90,13 @@ class HomeFragment :
 
         viewModel {
             myProfile observe { my ->
-                binding.homeTitleText.text = my.nickname
+                if (my.nickname != null) {
+                    binding.homeTitleText.apply {
+                        text = my.nickname
+                        visibility = View.VISIBLE
+                        binding.homeTitleShimmer.visibility = View.GONE
+                    }
+                }
             }
 
             navigationTarget observe { target ->
@@ -100,6 +106,7 @@ class HomeFragment :
                         findNavController().navigate(action)
                         viewModel.clearTrigger()
                     }
+
                     HomeNavigationTarget.ToSetting -> {}
                     HomeNavigationTarget.ToProfileEdit -> {}
                     null -> {}
@@ -159,14 +166,19 @@ class HomeFragment :
         )
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.scroll_session, parent, false)
+            val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.scroll_session, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val sessions = fakeData[position]
             holder.bind(sessions)
-            holder.itemView.setBackgroundColor(android.graphics.Color.parseColor(pageBackgroundColors[position]))
+            holder.itemView.setBackgroundColor(
+                android.graphics.Color.parseColor(
+                    pageBackgroundColors[position]
+                )
+            )
         }
 
         override fun getItemCount(): Int = fakeData.size
