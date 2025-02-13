@@ -40,6 +40,7 @@ mockk = "1.13.5"
 junit-version = "1.2.1"
 espresso-core = "3.6.1"
 appcompat = "1.7.0"
+shimmer = "0.5.0"
 
 
 
@@ -106,6 +107,7 @@ mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit-version" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 
 [bundles]
 androidx-lifecycle = ["androidx-runtime", "androidx-viewmodel"]
