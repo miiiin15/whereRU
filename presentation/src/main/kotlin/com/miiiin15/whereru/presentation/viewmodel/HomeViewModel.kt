@@ -5,10 +5,12 @@ import com.miiiin15.whereru.common.utils.UUIDUtil
 import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.CreateSessionUseCase
+import com.miiiin15.whereru.domain.usecase.GetAllProfilesUseCase
 import com.miiiin15.whereru.domain.usecase.GetProfileUseCase
 import com.miiiin15.whereru.domain.usecase.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
+import com.miiiin15.whereru.presentation.model.LocationSessionUiModel
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.model.toPresentation
 import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
@@ -31,17 +33,30 @@ class HomeViewModel @Inject constructor(
     private val _myProfile = MutableStateFlow<UserUiModel?>(null)
     val myProfile = _myProfile.asStateFlow()
 
+    private val _sessionList = MutableStateFlow<List<LocationSessionUiModel>>(emptyList())
+    val sessionList = _sessionList.asStateFlow()
+
+    private val _userList = MutableStateFlow<List<UserUiModel>>(emptyList())
+    val userList = _userList.asStateFlow()
+
+    private val _friendList = MutableStateFlow<List<UserUiModel>>(emptyList())
+    val friendList = _friendList.asStateFlow()
+
+
     val fetched = MutableLiveData<Boolean>(false)
 
     fun fetchProfile() = launch {
         authSessionManager.uid?.let { uid ->
             getProfileUseCase(uid)
                 .mapDataResource { it.toPresentation() }
-                .collectDataResource({ profile ->
-                    authSessionManager.setTargetSessionId(profile.sessionId)
-                    _myProfile.value = profile
-                    fetched.value = true
-                })
+                .collectDataResource(
+                    onSuccess = { profile ->
+                        authSessionManager.setTargetSessionId(profile.sessionId)
+                        _myProfile.value = profile
+                        fetched.value = true
+                    },
+                    loadingEnable = false
+                )
         }
     }
 

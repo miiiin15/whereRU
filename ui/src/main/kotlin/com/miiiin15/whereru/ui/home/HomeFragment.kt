@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.miiiin15.whereru.presentation.model.LocationSessionUiModel
 import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
 import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel
 import com.miiiin15.whereru.ui.R
@@ -23,6 +22,16 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment :
     BaseFragment<FragmentHomeBinding, HomeViewModel, HomeViewModel.Event>(R.layout.fragment_home) {
     override val viewModel: HomeViewModel by viewModels()
+
+    private val sessionListAdapter: SessionListAdapter by lazy {
+        SessionListAdapter()
+    }
+    private val userListAdapter: UserListAdapter by lazy {
+        UserListAdapter()
+    }
+    private val friendListAdapter: UserListAdapter by lazy {
+        UserListAdapter()
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,33 +70,6 @@ class HomeFragment :
             }
         }
 
-        val viewPager = binding.viewPager
-        viewPager.adapter = ViewPagerAdapter()
-
-        val categoryTexts = listOf(
-            binding.homeCategoryAllText,
-            binding.homeCategoryRecentText,
-            binding.homeCategoryFavoriteText
-        )
-
-        categoryTexts.forEachIndexed { index, textView ->
-            textView.setOnClickListener {
-                viewPager.currentItem = index
-            }
-        }
-
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                categoryTexts.forEachIndexed { index, textView ->
-                    textView.setTextColor(
-                        if (index == position) resources.getColor(R.color.black)
-                        else resources.getColor(R.color.gray1)
-                    )
-                }
-            }
-        })
-
         viewModel {
             myProfile observe { my ->
                 if (my.nickname != null) {
@@ -113,57 +95,42 @@ class HomeFragment :
                 }
             }
         }
+
+        setPagerView()
     }
 
     override fun handleEvent(event: HomeViewModel.Event) {
     }
 
+    private fun setPagerView() {
+        val homePagerView = binding.homePagerView
+        val categoryTexts = listOf(
+            binding.homeCategoryRecentText,
+            binding.homeCategoryAllText,
+            binding.homeCategoryFriendText
+        )
+
+        homePagerView.adapter = ViewPagerAdapter()
+        categoryTexts.forEachIndexed { index, textView ->
+            textView.setOnClickListener {
+                homePagerView.currentItem = index
+            }
+        }
+
+        homePagerView.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                categoryTexts.forEachIndexed { index, textView ->
+                    textView.setTextColor(
+                        if (index == position) resources.getColor(R.color.black)
+                        else resources.getColor(R.color.gray1)
+                    )
+                }
+            }
+        })
+    }
+
     private inner class ViewPagerAdapter : RecyclerView.Adapter<ViewPagerAdapter.ViewHolder>() {
-
-        private val fakeData = listOf(
-            listOf(
-                LocationSessionUiModel("host1", true, "2023-01-01 10:00:00"),
-                LocationSessionUiModel("host2", false, "2023-01-02 11:00:00"),
-                LocationSessionUiModel("host3", true, "2023-01-03 12:00:00"),
-                LocationSessionUiModel("host4", false, "2023-01-04 13:00:00"),
-                LocationSessionUiModel("host5", true, "2023-01-05 14:00:00"),
-                LocationSessionUiModel("host11", false, "2023-01-06 15:00:00"),
-                LocationSessionUiModel("host12", true, "2023-01-07 16:00:00"),
-                LocationSessionUiModel("host13", false, "2023-01-08 17:00:00"),
-                LocationSessionUiModel("host14", true, "2023-01-09 18:00:00"),
-                LocationSessionUiModel("host15", false, "2023-01-10 19:00:00")
-            ),
-            listOf(
-                LocationSessionUiModel("host6", true, "2023-01-06 15:00:00"),
-                LocationSessionUiModel("host7", false, "2023-01-07 16:00:00"),
-                LocationSessionUiModel("host8", true, "2023-01-08 17:00:00"),
-                LocationSessionUiModel("host9", false, "2023-01-09 18:00:00"),
-                LocationSessionUiModel("host10", true, "2023-01-10 19:00:00"),
-                LocationSessionUiModel("host16", false, "2023-01-11 20:00:00"),
-                LocationSessionUiModel("host17", true, "2023-01-12 21:00:00"),
-                LocationSessionUiModel("host18", false, "2023-01-13 22:00:00"),
-                LocationSessionUiModel("host19", true, "2023-01-14 23:00:00"),
-                LocationSessionUiModel("host20", false, "2023-01-15 00:00:00")
-            ),
-            listOf(
-                LocationSessionUiModel("host11", true, "2023-01-11 20:00:00"),
-                LocationSessionUiModel("host12", false, "2023-01-12 21:00:00"),
-                LocationSessionUiModel("host13", true, "2023-01-13 22:00:00"),
-                LocationSessionUiModel("host14", false, "2023-01-14 23:00:00"),
-                LocationSessionUiModel("host15", true, "2023-01-15 00:00:00"),
-                LocationSessionUiModel("host21", false, "2023-01-16 01:00:00"),
-                LocationSessionUiModel("host22", true, "2023-01-17 02:00:00"),
-                LocationSessionUiModel("host23", false, "2023-01-18 03:00:00"),
-                LocationSessionUiModel("host24", true, "2023-01-19 04:00:00"),
-                LocationSessionUiModel("host25", false, "2023-01-20 05:00:00")
-            )
-        )
-
-        private val pageBackgroundColors = listOf(
-            "#FF00FF",
-            "#00FF00",
-            "#0000FF"
-        )
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view =
@@ -172,24 +139,40 @@ class HomeFragment :
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val sessions = fakeData[position]
-            holder.bind(sessions)
-            holder.itemView.setBackgroundColor(
-                android.graphics.Color.parseColor(
-                    pageBackgroundColors[position]
-                )
-            )
+            holder.bind(position)
         }
 
-        override fun getItemCount(): Int = fakeData.size
+        override fun getItemCount(): Int = 3
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            private val recyclerView: RecyclerView = view.findViewById(R.id.session_list_recycler)
+            private val recyclerView: RecyclerView = view.findViewById(R.id.home_list_recycler)
 
-            fun bind(sessions: List<LocationSessionUiModel>) {
+            fun bind(position: Int) {
                 recyclerView.layoutManager = LinearLayoutManager(itemView.context)
-                recyclerView.adapter = SessionListItemAdapter(sessions)
+                when (position) {
+                    0 -> {
+                        recyclerView.adapter = sessionListAdapter
+                        viewModel.sessionList.observe { data ->
+                            sessionListAdapter.resetAll(data)
+                        }
+                    }
+
+                    1 -> {
+                        recyclerView.adapter = userListAdapter
+                        viewModel.userList.observe { data ->
+                            userListAdapter.resetAll(data)
+                        }
+                    }
+
+                    2 -> {
+                        recyclerView.adapter = friendListAdapter
+                        viewModel.friendList.observe { data ->
+                            friendListAdapter.resetAll(data)
+                        }
+                    }
+                }
             }
         }
     }
+
 }
