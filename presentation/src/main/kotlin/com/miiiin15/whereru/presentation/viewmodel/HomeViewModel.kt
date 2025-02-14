@@ -21,6 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val getAllProfilesUseCase: GetAllProfilesUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val createSessionUseCase: CreateSessionUseCase,
     private val updateProfileSessionIdUseCase: UpdateProfileSessionIdUseCase,
@@ -45,6 +46,10 @@ class HomeViewModel @Inject constructor(
 
     val fetched = MutableLiveData<Boolean>(false)
 
+    init {
+        getAllProfile()
+    }
+
     fun fetchProfile() = launch {
         authSessionManager.uid?.let { uid ->
             getProfileUseCase(uid)
@@ -58,6 +63,19 @@ class HomeViewModel @Inject constructor(
                     loadingEnable = false
                 )
         }
+    }
+
+    fun getAllProfile() = launch {
+
+        getAllProfilesUseCase()
+            .mapDataResource { list ->
+                list.filter { it.userId != authSessionManager.uid }
+                    .sortedByDescending { it.lastLoginAt }
+                    .map { it.toPresentation() }
+            }
+            .collectDataResource({
+                _userList.value = it
+            })
     }
 
     // 세션 ID 체크 후 네비게이션 트리거
