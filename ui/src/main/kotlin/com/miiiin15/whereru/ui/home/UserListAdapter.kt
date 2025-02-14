@@ -1,6 +1,7 @@
 package com.miiiin15.whereru.ui.home
 
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.databinding.ViewDataBinding
@@ -10,7 +11,9 @@ import com.miiiin15.whereru.ui.base.adapter.BaseAdapter
 import com.miiiin15.whereru.ui.base.adapter.BaseViewHolder
 import com.miiiin15.whereru.ui.databinding.ItemUserListBinding
 
-class UserListAdapter() :
+class UserListAdapter(
+    private val onClickListener: OnUserItemClickListener
+) :
     BaseAdapter<UserUiModel, UserListAdapter.BaseUserListAdapter<out ViewDataBinding>>() {
     private var emptyView: LinearLayout? = null
 
@@ -19,7 +22,7 @@ class UserListAdapter() :
         parent: ViewGroup,
         viewType: Int
     ): UserListAdapter.BaseUserListAdapter<out ViewDataBinding> =
-        LinearSessionListViewHolder(parent)
+        LinearUserListViewHolder(parent)
 
     override fun resetAll(items: List<UserUiModel>) {
         val diffCallback = UserDiffCallback(this.items, items)
@@ -44,36 +47,34 @@ class UserListAdapter() :
         }
     }
 
-    inner class LinearSessionListViewHolder(parent: ViewGroup) :
-        BaseUserListAdapter<ItemUserListBinding>(parent, R.layout.item_user_list) {
-        override val sessionBinding: ItemUserListBinding
+    inner class LinearUserListViewHolder(parent: ViewGroup) :
+        BaseUserListAdapter<ItemUserListBinding>(parent, R.layout.item_user_list, onClickListener) {
+        override val userBinding: ItemUserListBinding
             get() = binding
     }
 
     abstract class BaseUserListAdapter<B : ViewDataBinding>(
         parent: ViewGroup,
-        layoutResId: Int
+        layoutResId: Int,
+        onClickListener: OnUserItemClickListener
     ) :
         BaseViewHolder<B, UserUiModel>(
             parent,
             layoutResId
         ) {
-        abstract val sessionBinding: ItemUserListBinding
+        abstract val userBinding: ItemUserListBinding
 
         init {
-            sessionBinding.root.setOnClickListener {
-                println("🔆 : ${sessionBinding.userInfo}")
+            userBinding.root.setOnClickListener {
+                onClickListener.onUserItemClick(userBinding.userInfo!!)
             }
         }
 
         override fun setData(data: UserUiModel) {
-            sessionBinding.userInfo = data
-            sessionBinding.executePendingBindings()
+            userBinding.userInfo = data
+            userBinding.executePendingBindings()
             // TODO : Glide로 프로필 이미지 로딩
         }
 
-        fun showAlert() {
-            // TODO : 후속 액션 안내 창 띄우기
-        }
     }
 }

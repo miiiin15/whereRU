@@ -78,6 +78,12 @@ class HomeViewModel @Inject constructor(
             })
     }
 
+    // 세션 참가
+    fun participationSession(sessionId: String) {
+        authSessionManager.setTargetSessionId(sessionId)
+        _navigationTarget.value = HomeNavigationTarget.ToLiveLocation
+    }
+
     // 세션 ID 체크 후 네비게이션 트리거
     fun checkSessionID() {
         launch {

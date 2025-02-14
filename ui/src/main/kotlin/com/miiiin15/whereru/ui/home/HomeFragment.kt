@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
 import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel
 import com.miiiin15.whereru.ui.R
@@ -27,10 +28,31 @@ class HomeFragment :
         SessionListAdapter()
     }
     private val userListAdapter: UserListAdapter by lazy {
-        UserListAdapter()
+        UserListAdapter(object : OnUserItemClickListener {
+            override fun onUserItemClick(user: UserUiModel) {
+                showCustomBottomSheet(
+                    "${user.nickname}\n마지막 접속 : ${user.lastLoginAt}",
+                    "친구추가",
+                    "위치확인",
+                    onLeftButtonClick = {
+                        // TODO : 친구추가 기능 구현
+                    },
+                    onRightButtonClick = {
+                        if (user.sessionId.isNullOrBlank()) {
+                            showCustomAlert("위치를 공유하고 있지 않습니다.")
+                        } else {
+                            viewModel.participationSession(user.sessionId!!)
+                        }
+                    }
+                )
+            }
+        })
     }
     private val friendListAdapter: UserListAdapter by lazy {
-        UserListAdapter()
+        UserListAdapter(object : OnUserItemClickListener {
+            override fun onUserItemClick(user: UserUiModel) {
+            }
+        })
     }
 
 
