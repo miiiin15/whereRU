@@ -57,7 +57,6 @@ class LiveLocationViewModel @Inject constructor(
             getProfileUseCase(uid)
                 .mapDataResource { it.toPresentation() }
                 .collectDataResource({ profile ->
-                    authSessionManager.setTargetSessionId(profile.sessionId)
                     _myProfile.value = profile
                 })
         }

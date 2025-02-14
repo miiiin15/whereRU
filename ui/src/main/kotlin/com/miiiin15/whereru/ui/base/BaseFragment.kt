@@ -80,8 +80,8 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
         content: String = " ",
         buttonLeftText: String = "닫기",
         buttonRightText: String = "확인",
-        onLeftButtonClick: () -> Unit = { viewModel.hideBottomSheet() },
-        onRightButtonClick: () -> Unit? = { viewModel.hideBottomSheet() }
+        onLeftButtonClick: () -> Unit = { },
+        onRightButtonClick: () -> Unit? = { }
     ) {
         CustomBottomSheetDialog(
             content = content,
