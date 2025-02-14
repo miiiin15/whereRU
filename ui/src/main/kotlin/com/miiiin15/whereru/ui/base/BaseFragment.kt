@@ -15,6 +15,7 @@ import com.miiiin15.whereru.presentation.extension.observe
 import com.miiiin15.whereru.ui.extension.repeatOnStarted
 import kotlinx.coroutines.flow.StateFlow
 import com.miiiin15.whereru.ui.BR
+import com.miiiin15.whereru.ui.component.CustomBottomSheetDialog
 import com.miiiin15.whereru.ui.custom.LoadingDialog
 
 abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : ViewEvent>(
@@ -73,6 +74,22 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
                 showCustomAlert(it)
             }
         }
+    }
+
+    fun showCustomBottomSheet(
+        content: String = " ",
+        buttonLeftText: String = "닫기",
+        buttonRightText: String = "확인",
+        onLeftButtonClick: () -> Unit = { viewModel.hideBottomSheet() },
+        onRightButtonClick: () -> Unit? = { viewModel.hideBottomSheet() }
+    ) {
+        CustomBottomSheetDialog(
+            content = content,
+            buttonLeftText = buttonLeftText,
+            buttonRightText = buttonRightText,
+            onLeftButtonClick = onLeftButtonClick,
+            onRightButtonClick = onRightButtonClick
+        ).show(childFragmentManager, "CustomBottomSheetDialog")
     }
 
     fun showCustomAlert(message: String, onConfirmed: (() -> Unit)? = null) {
