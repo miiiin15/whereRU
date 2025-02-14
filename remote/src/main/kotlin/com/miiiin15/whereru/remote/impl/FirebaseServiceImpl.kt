@@ -29,18 +29,27 @@ class FirebaseServiceImpl @Inject constructor(
     // 세션 리스너를 관리하는 맵
     private val sessionListeners = mutableMapOf<String, ValueEventListener>()
 
+    /**
+     * 일반 이메일 로그인
+     * **/
     override suspend fun login(email: String, password: String): String {
         return runCatching {
             firebaseAuth.signInWithEmailAndPassword(email, password).await().user!!.uid
         }.getOrElse { throw Exception("로그인 실패: ${it.message}") }
     }
 
+    /**
+     * 일반 이메일 회원가입
+     * **/
     override suspend fun register(email: String, password: String): String {
         return runCatching {
             firebaseAuth.createUserWithEmailAndPassword(email, password).await().user!!.uid
         }.getOrElse { throw Exception("회원가입 실패: ${it.message}") }
     }
 
+    /**
+     * 내 위치 업데이트
+     * **/
     override suspend fun updateMyLocation(
         sessionId: String,
         uid: String,
@@ -58,6 +67,9 @@ class FirebaseServiceImpl @Inject constructor(
             .await()
     }
 
+    /**
+     * 세션 생성
+     * **/
     override suspend fun createSession(sessionId: String, hostId: String): Unit {
 
         val createSessionRequest = CreateSessionRequest(
@@ -72,6 +84,9 @@ class FirebaseServiceImpl @Inject constructor(
             .await()
     }
 
+    /**
+     * 모든 프로필 조회
+     * **/
     override suspend fun getAllProfiles(): List<ProfileEntity> {
         return runCatching {
             firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
@@ -81,6 +96,9 @@ class FirebaseServiceImpl @Inject constructor(
         }.getOrElse { throw Exception("프로필 조회 실패: ${it.message}") }
     }
 
+    /**
+     * 단일 프로필 조회
+     * **/
     override suspend fun getProfile(userId: String): ProfileEntity {
         return runCatching {
             firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
@@ -91,6 +109,9 @@ class FirebaseServiceImpl @Inject constructor(
         }.getOrElse { throw Exception("프로필 조회 실패: ${it.message} ") }
     }
 
+    /**
+     * 프로필 저장
+     * **/
     override suspend fun setProfile(profile: ProfileEntity): Unit {
         firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
             .document(profile.userId)
@@ -98,6 +119,9 @@ class FirebaseServiceImpl @Inject constructor(
             .await()
     }
 
+    /**
+     * 프로필 세션 ID 업데이트
+     * **/
     override suspend fun updateProfileSessionId(userId: String, sessionId: String) {
         runCatching {
             firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
@@ -107,6 +131,9 @@ class FirebaseServiceImpl @Inject constructor(
         }.getOrElse { throw Exception("세션 ID 갱신 실패 : ${it.message}") }
     }
 
+    /**
+     * 마지막 로그인 시간 업데이트
+     * **/
     override suspend fun updateLastLogin(userId: String, lastLoginAt: Long) {
         firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
             .document(userId)
@@ -114,6 +141,9 @@ class FirebaseServiceImpl @Inject constructor(
             .await()
     }
 
+    /**
+     * 위치 공유 세션 추적
+     * **/
     override fun observeSession(
         sessionId: String,
         onSessionUpdated: (LiveLocationResponse) -> Unit,
@@ -176,6 +206,9 @@ class FirebaseServiceImpl @Inject constructor(
         sessionListeners[sessionId] = listener
     }
 
+    /**
+     * 세션 종료
+     * **/
     override suspend fun stopObserveSession(sessionId: String) {
         sessionListeners[sessionId]?.let {
             firebaseDatabase.getReference("${FirebasePaths.LOCATION_SESSIONS}/$sessionId")
