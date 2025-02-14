@@ -1,6 +1,8 @@
 package com.miiiin15.whereru.ui.home
 
+import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.databinding.ViewDataBinding
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.ui.R
@@ -10,6 +12,8 @@ import com.miiiin15.whereru.ui.databinding.ItemUserListBinding
 
 class UserListAdapter() :
     BaseAdapter<UserUiModel, UserListAdapter.BaseUserListAdapter<out ViewDataBinding>>() {
+    private var emptyView: LinearLayout? = null
+
 
     override fun getViewHolder(
         parent: ViewGroup,
@@ -20,6 +24,24 @@ class UserListAdapter() :
     override fun resetAll(items: List<UserUiModel>) {
         val diffCallback = UserDiffCallback(this.items, items)
         resetAll(items, diffCallback)
+        checkEmptyView()
+    }
+
+    fun setEmptyView(view: LinearLayout) {
+        emptyView = view
+        checkEmptyView()
+    }
+
+    private fun checkEmptyView() {
+        if (emptyView != null) {
+            if (items.isNullOrEmpty()) {
+                recyclerView.visibility = View.GONE
+                emptyView!!.visibility = View.VISIBLE
+            } else {
+                recyclerView.visibility = View.VISIBLE
+                emptyView!!.visibility = View.GONE
+            }
+        }
     }
 
     inner class LinearSessionListViewHolder(parent: ViewGroup) :

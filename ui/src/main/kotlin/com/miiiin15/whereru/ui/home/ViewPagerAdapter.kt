@@ -27,7 +27,7 @@ class ViewPagerAdapter(
         private val emptyView: LinearLayout = view.findViewById(R.id.home_list_empty_view)
 
         fun bind(position: Int) {
-            fragment.bind(position, recyclerView, emptyView)
+            fragment.bindViewPager(position, recyclerView, emptyView)
         }
     }
 }

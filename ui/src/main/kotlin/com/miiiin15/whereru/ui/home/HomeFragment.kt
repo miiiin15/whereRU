@@ -96,12 +96,12 @@ class HomeFragment :
             }
         }
 
-        setPagerView()
+        setViewPager()
     }
 
 
     // ViewPager2 + 상단 카테고리 연결 설정
-    private fun setPagerView() {
+    private fun setViewPager() {
         val homePagerView = binding.homePagerView
         val categoryTexts = Category.values().map { category ->
             when (category) {
@@ -118,8 +118,6 @@ class HomeFragment :
             }
         }
 
-
-
         homePagerView.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -134,49 +132,33 @@ class HomeFragment :
         })
     }
 
-    // ViewPager2 Adapter 바인딩 용
-    fun bind(position: Int, recyclerView: RecyclerView, emptyView: LinearLayout) {
+    // ViewPager2 Adapter 내부 바인딩 용
+    fun bindViewPager(position: Int, recyclerView: RecyclerView, emptyView: LinearLayout) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val lifecycleOwner = viewLifecycleOwner
         when (position) {
             0 -> {
                 recyclerView.adapter = sessionListAdapter
+                sessionListAdapter.setEmptyView(emptyView)
                 viewModel.sessionList.observe { data ->
-                    checkDataIsNullOrEmpty(data, recyclerView, emptyView)
                     sessionListAdapter.resetAll(data)
                 }
             }
 
             1 -> {
                 recyclerView.adapter = userListAdapter
+                userListAdapter.setEmptyView(emptyView)
                 viewModel.userList.observe { data ->
-                    checkDataIsNullOrEmpty(data, recyclerView, emptyView)
                     userListAdapter.resetAll(data)
                 }
             }
 
             2 -> {
                 recyclerView.adapter = friendListAdapter
+                friendListAdapter.setEmptyView(emptyView)
                 viewModel.friendList.observe { data ->
-                    checkDataIsNullOrEmpty(data, recyclerView, emptyView)
                     friendListAdapter.resetAll(data)
                 }
             }
-        }
-    }
-
-    // RecyclerView 데이터가 없을 때 처리
-    private fun checkDataIsNullOrEmpty(
-        data: List<Any>?,
-        recyclerView: RecyclerView,
-        emptyView: LinearLayout
-    ) {
-        if (data.isNullOrEmpty()) {
-            recyclerView.visibility = View.GONE
-            emptyView.visibility = View.VISIBLE
-        } else {
-            recyclerView.visibility = View.VISIBLE
-            emptyView.visibility = View.GONE
         }
     }
 

@@ -1,6 +1,8 @@
 package com.miiiin15.whereru.ui.home
 
+import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.databinding.ViewDataBinding
 import com.miiiin15.whereru.presentation.model.LocationSessionUiModel
 import com.miiiin15.whereru.ui.R
@@ -16,11 +18,31 @@ class SessionListAdapter() :
         viewType: Int
     ): SessionListAdapter.BaseSessionListAdapter<out ViewDataBinding> =
         LinearSessionListViewHolder(parent)
+    private var emptyView: LinearLayout? = null
 
     override fun resetAll(items: List<LocationSessionUiModel>) {
         val diffCallback = SessionDiffCallback(this.items, items)
         resetAll(items, diffCallback)
+        checkEmptyView()
     }
+
+    fun setEmptyView(view: LinearLayout) {
+        emptyView = view
+        checkEmptyView()
+    }
+
+    private fun checkEmptyView() {
+        if (emptyView != null) {
+            if (items.isNullOrEmpty()) {
+                recyclerView.visibility = View.GONE
+                emptyView!!.visibility = View.VISIBLE
+            } else {
+                recyclerView.visibility = View.VISIBLE
+                emptyView!!.visibility = View.GONE
+            }
+        }
+    }
+
 
     inner class LinearSessionListViewHolder(parent: ViewGroup) :
         BaseSessionListAdapter<ItemSessionListBinding>(parent, R.layout.item_session_list) {
