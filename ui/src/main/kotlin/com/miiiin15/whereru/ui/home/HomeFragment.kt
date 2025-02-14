@@ -2,9 +2,7 @@ package com.miiiin15.whereru.ui.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
@@ -23,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment :
     BaseFragment<FragmentHomeBinding, HomeViewModel, HomeViewModel.Event>(R.layout.fragment_home) {
     override val viewModel: HomeViewModel by viewModels()
+    private var currentCategory: Category = Category.RECENT
 
     private val sessionListAdapter: SessionListAdapter by lazy {
         SessionListAdapter()
@@ -100,27 +99,31 @@ class HomeFragment :
         setPagerView()
     }
 
-    override fun handleEvent(event: HomeViewModel.Event) {
-    }
 
+    // ViewPager2 + 상단 카테고리 연결 설정
     private fun setPagerView() {
         val homePagerView = binding.homePagerView
-        val categoryTexts = listOf(
-            binding.homeCategoryRecentText,
-            binding.homeCategoryAllText,
-            binding.homeCategoryFriendText
-        )
+        val categoryTexts = Category.values().map { category ->
+            when (category) {
+                Category.RECENT -> binding.homeCategoryRecentText
+                Category.ALL -> binding.homeCategoryAllText
+                Category.FRIEND -> binding.homeCategoryFriendText
+            }
+        }
 
-        homePagerView.adapter = ViewPagerAdapter()
+        homePagerView.adapter = ViewPagerAdapter(this)
         categoryTexts.forEachIndexed { index, textView ->
             textView.setOnClickListener {
                 homePagerView.currentItem = index
             }
         }
 
+
+
         homePagerView.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                currentCategory = Category.values()[position]
                 categoryTexts.forEachIndexed { index, textView ->
                     textView.setTextColor(
                         if (index == position) resources.getColor(R.color.black)
@@ -131,63 +134,58 @@ class HomeFragment :
         })
     }
 
-    private inner class ViewPagerAdapter : RecyclerView.Adapter<ViewPagerAdapter.ViewHolder>() {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.scroll_session, parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(position)
-        }
-
-        override fun getItemCount(): Int = 3
-
-       inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            private val recyclerView: RecyclerView = view.findViewById(R.id.home_list_recycler)
-            private val emptyView: LinearLayout = view.findViewById(R.id.home_list_empty_view)
-
-            private fun checkDataIsNullOrEmpty(data: List<Any>?) {
-                if (data.isNullOrEmpty()) {
-                    recyclerView.visibility = View.GONE
-                    emptyView.visibility = View.VISIBLE
-                } else {
-                    recyclerView.visibility = View.VISIBLE
-                    emptyView.visibility = View.GONE
+    // ViewPager2 Adapter 바인딩 용
+    fun bind(position: Int, recyclerView: RecyclerView, emptyView: LinearLayout) {
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val lifecycleOwner = viewLifecycleOwner
+        when (position) {
+            0 -> {
+                recyclerView.adapter = sessionListAdapter
+                viewModel.sessionList.observe { data ->
+                    checkDataIsNullOrEmpty(data, recyclerView, emptyView)
+                    sessionListAdapter.resetAll(data)
                 }
             }
 
-            fun bind(position: Int) {
-                recyclerView.layoutManager = LinearLayoutManager(itemView.context)
-                when (position) {
-                    0 -> {
-                        recyclerView.adapter = sessionListAdapter
-                        viewModel.sessionList.observe { data ->
-                            checkDataIsNullOrEmpty(data)
-                            sessionListAdapter.resetAll(data)
-                        }
-                    }
+            1 -> {
+                recyclerView.adapter = userListAdapter
+                viewModel.userList.observe { data ->
+                    checkDataIsNullOrEmpty(data, recyclerView, emptyView)
+                    userListAdapter.resetAll(data)
+                }
+            }
 
-                    1 -> {
-                        recyclerView.adapter = userListAdapter
-                        viewModel.userList.observe { data ->
-                            checkDataIsNullOrEmpty(data)
-                            userListAdapter.resetAll(data)
-                        }
-                    }
-
-                    2 -> {
-                        recyclerView.adapter = friendListAdapter
-                        viewModel.friendList.observe { data ->
-                            checkDataIsNullOrEmpty(data)
-                            friendListAdapter.resetAll(data)
-                        }
-                    }
+            2 -> {
+                recyclerView.adapter = friendListAdapter
+                viewModel.friendList.observe { data ->
+                    checkDataIsNullOrEmpty(data, recyclerView, emptyView)
+                    friendListAdapter.resetAll(data)
                 }
             }
         }
     }
 
+    // RecyclerView 데이터가 없을 때 처리
+    private fun checkDataIsNullOrEmpty(
+        data: List<Any>?,
+        recyclerView: RecyclerView,
+        emptyView: LinearLayout
+    ) {
+        if (data.isNullOrEmpty()) {
+            recyclerView.visibility = View.GONE
+            emptyView.visibility = View.VISIBLE
+        } else {
+            recyclerView.visibility = View.VISIBLE
+            emptyView.visibility = View.GONE
+        }
+    }
+
+    override fun handleEvent(event: HomeViewModel.Event) {
+    }
+
+    enum class Category {
+        RECENT, ALL, FRIEND
+    }
+
 }
+
