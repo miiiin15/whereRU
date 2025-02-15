@@ -5,8 +5,10 @@ import com.miiiin15.whereru.common.utils.UUIDUtil
 import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.CreateSessionUseCase
+import com.miiiin15.whereru.domain.usecase.ExitSessionUserCase
 import com.miiiin15.whereru.domain.usecase.GetAllProfilesUseCase
 import com.miiiin15.whereru.domain.usecase.GetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.ParticipationSessionUseCase
 import com.miiiin15.whereru.domain.usecase.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
@@ -23,6 +25,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getAllProfilesUseCase: GetAllProfilesUseCase,
     private val getProfileUseCase: GetProfileUseCase,
+    private val participationSessionUseCase: ParticipationSessionUseCase,
+    private val exitSessionUseCase: ExitSessionUserCase,
     private val createSessionUseCase: CreateSessionUseCase,
     private val updateProfileSessionIdUseCase: UpdateProfileSessionIdUseCase,
     private val authSessionManager: AuthSessionManager,
@@ -79,9 +83,30 @@ class HomeViewModel @Inject constructor(
     }
 
     // 세션 참가
-    fun participationSession(sessionId: String) {
-        authSessionManager.setTargetSessionId(sessionId)
-        _navigationTarget.value = HomeNavigationTarget.ToLiveLocation
+    fun participationSession(sessionId: String, hostNickname: String) {
+        launch {
+            participationSessionUseCase(
+                authSessionManager.uid!!,
+                sessionId,
+                hostNickname,
+                System.currentTimeMillis()
+            ).collectDataResource({
+                authSessionManager.setTargetSessionId(sessionId)
+                _navigationTarget.value = HomeNavigationTarget.ToLiveLocation
+            })
+        }
+    }
+
+    // 세션 탈퇴
+    fun exitSession(sessionId: String) {
+        launch {
+            exitSessionUseCase(
+                authSessionManager.uid!!,
+                sessionId
+            ).collectDataResource({
+                // TODO: 세션 탈퇴 후 처리
+            })
+        }
     }
 
     // 세션 ID 체크 후 네비게이션 트리거

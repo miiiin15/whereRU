@@ -41,7 +41,7 @@ class HomeFragment :
                         if (user.sessionId.isNullOrBlank()) {
                             showCustomAlert("위치를 공유하고 있지 않습니다.")
                         } else {
-                            viewModel.participationSession(user.sessionId!!)
+                            viewModel.participationSession(user.sessionId!!,user.nickname!!)
                         }
                     }
                 )

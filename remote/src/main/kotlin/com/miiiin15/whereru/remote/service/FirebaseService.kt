@@ -40,4 +40,13 @@ interface FirebaseService {
 
     suspend fun stopObserveSession(sessionId: String): Unit
 
+    suspend fun participationSession(
+        userId: String,
+        targetSessionId: String,
+        hostNickname: String,
+        participationTime: Long
+    ): Unit
+
+    suspend fun exitSession(userId: String, targetSessionId: String): Unit
+
 }

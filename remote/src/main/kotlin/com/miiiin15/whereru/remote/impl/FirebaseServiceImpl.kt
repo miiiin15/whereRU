@@ -5,6 +5,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.miiiin15.whereru.data.model.LiveLocationEntity
 import com.miiiin15.whereru.data.model.ProfileEntity
@@ -14,6 +15,7 @@ import com.miiiin15.whereru.remote.model.LiveLocationDataBlock
 import com.miiiin15.whereru.remote.model.LiveLocationResponse
 import com.miiiin15.whereru.remote.model.LiveLocationUserBlock
 import com.miiiin15.whereru.remote.model.MyLocationRequest
+import com.miiiin15.whereru.remote.model.ParticipationSessionRequest
 import com.miiiin15.whereru.remote.service.FirebaseService
 import com.miiiin15.whereru.remote.utils.FirebasePaths
 import kotlinx.coroutines.tasks.await
@@ -83,6 +85,42 @@ class FirebaseServiceImpl @Inject constructor(
             .setValue(createSessionRequest)
             .await()
     }
+
+    /**
+     * 세션 참가
+     * **/
+    override suspend fun participationSession(
+        userId: String,
+        targetSessionId: String,
+        hostNickname: String,
+        participationTime: Long
+    ): Unit {
+        runCatching {
+            val participationRequest = ParticipationSessionRequest(hostNickname, participationTime)
+
+            firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
+                .document(targetSessionId)
+                .set(participationRequest)
+                .await()
+        }.getOrElse {
+            throw Exception("세션 기록 실패: ${it.message}")
+        }
+    }
+
+    /**
+     * 세션 이탈
+     * **/
+    override suspend fun exitSession(userId: String, targetSessionId: String): Unit {
+        runCatching {
+            firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
+                .document(targetSessionId)
+                .delete()
+                .await()
+        }.getOrElse {
+            throw Exception("세션 이탈 실패: ${it.message}")
+        }
+    }
+
 
     /**
      * 모든 프로필 조회
@@ -217,6 +255,6 @@ class FirebaseServiceImpl @Inject constructor(
             println("⛔️Stop Observe Location Session⛔️")
         }
     }
-    
+
 }
 

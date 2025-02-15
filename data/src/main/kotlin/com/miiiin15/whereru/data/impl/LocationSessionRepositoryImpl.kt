@@ -36,5 +36,26 @@ internal class LocationSessionRepositoryImpl @Inject constructor(
             locationRemoteDataSource.stopObserveSession(sessionId)
         }
 
+    override fun participationSession(
+        userId: String,
+        targetSessionId: String,
+        hostNickname: String,
+        participationTime: Long
+    ): Flow<DataResource<Unit>> =
+
+        flowDataResource {
+            locationRemoteDataSource.participationSession(
+                userId,
+                targetSessionId,
+                hostNickname,
+                participationTime
+            )
+        }
+
+    override fun exitSession(userId: String, targetSessionId: String): Flow<DataResource<Unit>> =
+        flowDataResource {
+            locationRemoteDataSource.exitSession(userId, targetSessionId)
+        }
+
     // TODO : local과 연계
 }

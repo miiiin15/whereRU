@@ -15,4 +15,12 @@ interface LocationSessionRepository {
 
     fun stopObserveSession(sessionId: String): Flow<DataResource<Unit>>
 
+    fun participationSession(
+        userId: String,
+        targetSessionId: String,
+        hostNickname:String,
+        participationTime: Long
+    ): Flow<DataResource<Unit>>
+
+    fun exitSession(userId: String, targetSessionId: String): Flow<DataResource<Unit>>
 }

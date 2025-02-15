@@ -28,4 +28,22 @@ class LocationSessionRemoteDataSourceImpl @Inject constructor(
     override suspend fun stopObserveSession(sessionId: String) {
         firebaseService.stopObserveSession(sessionId)
     }
+
+    override suspend fun participationSession(
+        userId: String,
+        targetSessionId: String,
+        hostNickname: String,
+        participationTime: Long
+    ) {
+        firebaseService.participationSession(
+            userId,
+            targetSessionId,
+            hostNickname,
+            participationTime
+        )
+    }
+
+    override suspend fun exitSession(userId: String, targetSessionId: String) {
+        firebaseService.exitSession(userId, targetSessionId)
+    }
 }
