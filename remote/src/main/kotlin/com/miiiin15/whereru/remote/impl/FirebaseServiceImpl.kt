@@ -5,9 +5,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.miiiin15.whereru.data.model.LiveLocationEntity
+import com.miiiin15.whereru.data.model.JoinedSessionEntity
 import com.miiiin15.whereru.data.model.ProfileEntity
 import com.miiiin15.whereru.data.model.MyLocationEntity
 import com.miiiin15.whereru.remote.model.CreateSessionRequest
@@ -85,6 +84,20 @@ class FirebaseServiceImpl @Inject constructor(
             .setValue(createSessionRequest)
             .await()
     }
+
+    /**
+     * 최근 참여한 모든 세션 조회
+     * **/
+override suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity> {
+    return runCatching {
+        firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
+            .get()
+            .await()
+            .documents.map { document ->
+                document.toObject(JoinedSessionEntity::class.java)?.copy(sessionId = document.id)
+            }.filterNotNull()
+    }.getOrElse { throw Exception("세션 조회 실패: ${it.message}") }
+}
 
     /**
      * 세션 참가

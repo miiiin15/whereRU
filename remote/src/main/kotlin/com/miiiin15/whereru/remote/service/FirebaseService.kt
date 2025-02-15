@@ -1,5 +1,6 @@
 package com.miiiin15.whereru.remote.service
 
+import com.miiiin15.whereru.data.model.JoinedSessionEntity
 import com.miiiin15.whereru.data.model.ProfileEntity
 import com.miiiin15.whereru.data.model.MyLocationEntity
 import com.miiiin15.whereru.remote.model.LiveLocationResponse
@@ -39,6 +40,8 @@ interface FirebaseService {
     ): Unit
 
     suspend fun stopObserveSession(sessionId: String): Unit
+
+    suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity>
 
     suspend fun participationSession(
         userId: String,

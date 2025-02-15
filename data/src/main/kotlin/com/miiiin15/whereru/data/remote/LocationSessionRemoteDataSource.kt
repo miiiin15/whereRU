@@ -1,5 +1,6 @@
 package com.miiiin15.whereru.data.remote
 
+import com.miiiin15.whereru.data.model.JoinedSessionEntity
 import com.miiiin15.whereru.data.model.LiveLocationEntity
 
 
@@ -14,6 +15,8 @@ interface LocationSessionRemoteDataSource {
     ): Unit
 
     suspend fun stopObserveSession(sessionId: String): Unit
+
+    suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity>
 
     suspend fun participationSession(
         userId: String,

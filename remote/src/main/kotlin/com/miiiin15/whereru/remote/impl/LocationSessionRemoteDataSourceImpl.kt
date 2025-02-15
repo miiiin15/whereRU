@@ -1,5 +1,6 @@
 package com.miiiin15.whereru.remote.impl
 
+import com.miiiin15.whereru.data.model.JoinedSessionEntity
 import com.miiiin15.whereru.data.model.LiveLocationEntity
 import com.miiiin15.whereru.data.remote.LocationSessionRemoteDataSource
 import com.miiiin15.whereru.remote.service.FirebaseService
@@ -28,6 +29,9 @@ class LocationSessionRemoteDataSourceImpl @Inject constructor(
     override suspend fun stopObserveSession(sessionId: String) {
         firebaseService.stopObserveSession(sessionId)
     }
+
+    override suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity> =
+        firebaseService.getRecentSessionList(userId)
 
     override suspend fun participationSession(
         userId: String,

@@ -3,6 +3,7 @@ package com.miiiin15.whereru.data.impl
 import com.miiiin15.whereru.data.bound.flowDataResource
 import com.miiiin15.whereru.data.remote.LocationSessionRemoteDataSource
 import com.miiiin15.whereru.data_resource.DataResource
+import com.miiiin15.whereru.domain.model.JoinedSession
 import com.miiiin15.whereru.domain.model.LiveLocationSession
 import com.miiiin15.whereru.domain.repository.LocationSessionRepository
 import kotlinx.coroutines.flow.Flow
@@ -34,6 +35,11 @@ internal class LocationSessionRepositoryImpl @Inject constructor(
     override fun stopObserveSession(sessionId: String): Flow<DataResource<Unit>> =
         flowDataResource {
             locationRemoteDataSource.stopObserveSession(sessionId)
+        }
+
+    override fun getRecentSessionList(userId: String): Flow<DataResource<List<JoinedSession>>> =
+        flowDataResource {
+            locationRemoteDataSource.getRecentSessionList(userId)
         }
 
     override fun participationSession(

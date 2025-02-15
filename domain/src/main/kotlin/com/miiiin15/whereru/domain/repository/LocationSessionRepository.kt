@@ -1,6 +1,7 @@
 package com.miiiin15.whereru.domain.repository
 
 import com.miiiin15.whereru.data_resource.DataResource
+import com.miiiin15.whereru.domain.model.JoinedSession
 import com.miiiin15.whereru.domain.model.LiveLocationSession
 import kotlinx.coroutines.flow.Flow
 
@@ -14,6 +15,8 @@ interface LocationSessionRepository {
     )
 
     fun stopObserveSession(sessionId: String): Flow<DataResource<Unit>>
+
+    fun getRecentSessionList(userId: String): Flow<DataResource<List<JoinedSession>>>
 
     fun participationSession(
         userId: String,
