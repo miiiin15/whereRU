@@ -4,23 +4,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.databinding.ViewDataBinding
-import com.miiiin15.whereru.presentation.model.LocationSessionUiModel
+import com.miiiin15.whereru.presentation.model.JoinedSessionUiModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.adapter.BaseAdapter
 import com.miiiin15.whereru.ui.base.adapter.BaseViewHolder
 import com.miiiin15.whereru.ui.databinding.ItemSessionListBinding
 
-class SessionListAdapter() :
-    BaseAdapter<LocationSessionUiModel, SessionListAdapter.BaseSessionListAdapter<out ViewDataBinding>>() {
+class SessionListAdapter(
+    private val onSessionItemClickListener: OnSessionItemClickListener
+) :
+    BaseAdapter<JoinedSessionUiModel, SessionListAdapter.BaseSessionListAdapter<out ViewDataBinding>>() {
 
     override fun getViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): SessionListAdapter.BaseSessionListAdapter<out ViewDataBinding> =
         LinearSessionListViewHolder(parent)
+
     private var emptyView: LinearLayout? = null
 
-    override fun resetAll(items: List<LocationSessionUiModel>) {
+    override fun resetAll(items: List<JoinedSessionUiModel>) {
         val diffCallback = SessionDiffCallback(this.items, items)
         resetAll(items, diffCallback)
         checkEmptyView()
@@ -45,28 +48,34 @@ class SessionListAdapter() :
 
 
     inner class LinearSessionListViewHolder(parent: ViewGroup) :
-        BaseSessionListAdapter<ItemSessionListBinding>(parent, R.layout.item_session_list) {
+        BaseSessionListAdapter<ItemSessionListBinding>(
+            parent,
+            R.layout.item_session_list,
+            onSessionItemClickListener
+        ) {
         override val sessionBinding: ItemSessionListBinding
             get() = binding
     }
 
+    @Suppress("LeakingThis")
     abstract class BaseSessionListAdapter<B : ViewDataBinding>(
         parent: ViewGroup,
-        layoutResId: Int
+        layoutResId: Int,
+        onSessionItemClickListener: OnSessionItemClickListener,
     ) :
-        BaseViewHolder<B, LocationSessionUiModel>(
+        BaseViewHolder<B, JoinedSessionUiModel>(
             parent,
             layoutResId
         ) {
         abstract val sessionBinding: ItemSessionListBinding
 
         init {
-            sessionBinding.root.setOnClickListener {
-                println("🔆 : ${sessionBinding.sessionInfo}")
+            sessionBinding.sessionListItemRoot.setOnClickListener {
+                onSessionItemClickListener.onSessionItemClick(sessionBinding.sessionInfo!!)
             }
         }
 
-        override fun setData(data: LocationSessionUiModel) {
+        override fun setData(data: JoinedSessionUiModel) {
             sessionBinding.sessionInfo = data
             sessionBinding.executePendingBindings()
             // TODO : Glide로 프로필 이미지 로딩
