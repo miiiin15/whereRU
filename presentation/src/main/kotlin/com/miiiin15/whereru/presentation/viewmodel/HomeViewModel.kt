@@ -52,10 +52,10 @@ class HomeViewModel @Inject constructor(
     val fetched = MutableLiveData(false)
 
     init {
-        fetList()
+        fetchList()
     }
 
-    fun fetList() {
+    fun fetchList() {
         getAllProfile()
         getRecentSessionList()
         // TODO : 친구 목록 가져오기
