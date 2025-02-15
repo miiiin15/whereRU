@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.miiiin15.whereru.presentation.model.JoinedSessionUiModel
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
 import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel
@@ -25,15 +26,30 @@ class HomeFragment :
     private var currentCategory: Category = Category.RECENT
 
     private val sessionListAdapter: SessionListAdapter by lazy {
-        SessionListAdapter()
+        SessionListAdapter(object : OnSessionItemClickListener {
+            override fun onSessionItemClick(session: JoinedSessionUiModel) {
+                showCustomBottomSheet(
+                    "${session.hostNickname}님의 세션\n최근 입장 시간 : ${session.participationTime}",
+                    "삭제",
+                    "재입장",
+                    onLeftButtonClick = {
+                        viewModel.exitSession(session.sessionId)
+                    },
+                    onRightButtonClick = {
+                        viewModel.participationSession(session.sessionId, session.hostNickname)
+                    }
+                )
+            }
+        }
+        )
     }
     private val userListAdapter: UserListAdapter by lazy {
         UserListAdapter(object : OnUserItemClickListener {
             override fun onUserItemClick(user: UserUiModel) {
                 showCustomBottomSheet(
                     "${user.nickname}\n마지막 접속 : ${user.lastLoginAt}",
-                    "친구추가",
-                    "위치확인",
+                    "친구 추가",
+                    "세션 입장",
                     onLeftButtonClick = {
                         // TODO : 친구추가 기능 구현
                     },
@@ -41,7 +57,7 @@ class HomeFragment :
                         if (user.sessionId.isNullOrBlank()) {
                             showCustomAlert("위치를 공유하고 있지 않습니다.")
                         } else {
-                            viewModel.participationSession(user.sessionId!!,user.nickname!!)
+                            viewModel.participationSession(user.sessionId!!, user.nickname!!)
                         }
                     }
                 )

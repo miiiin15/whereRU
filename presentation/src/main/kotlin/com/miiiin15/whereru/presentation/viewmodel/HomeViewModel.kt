@@ -8,11 +8,12 @@ import com.miiiin15.whereru.domain.usecase.CreateSessionUseCase
 import com.miiiin15.whereru.domain.usecase.ExitSessionUserCase
 import com.miiiin15.whereru.domain.usecase.GetAllProfilesUseCase
 import com.miiiin15.whereru.domain.usecase.GetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.GetRecentSessionListUseCase
 import com.miiiin15.whereru.domain.usecase.ParticipationSessionUseCase
 import com.miiiin15.whereru.domain.usecase.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
-import com.miiiin15.whereru.presentation.model.LocationSessionUiModel
+import com.miiiin15.whereru.presentation.model.JoinedSessionUiModel
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.model.toPresentation
 import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getAllProfilesUseCase: GetAllProfilesUseCase,
     private val getProfileUseCase: GetProfileUseCase,
+    private val getRecentSessionListUseCase: GetRecentSessionListUseCase,
     private val participationSessionUseCase: ParticipationSessionUseCase,
     private val exitSessionUseCase: ExitSessionUserCase,
     private val createSessionUseCase: CreateSessionUseCase,
@@ -38,7 +40,7 @@ class HomeViewModel @Inject constructor(
     private val _myProfile = MutableStateFlow<UserUiModel?>(null)
     val myProfile = _myProfile.asStateFlow()
 
-    private val _sessionList = MutableStateFlow<List<LocationSessionUiModel>>(emptyList())
+    private val _sessionList = MutableStateFlow<List<JoinedSessionUiModel>>(emptyList())
     val sessionList = _sessionList.asStateFlow()
 
     private val _userList = MutableStateFlow<List<UserUiModel>>(emptyList())
@@ -47,13 +49,19 @@ class HomeViewModel @Inject constructor(
     private val _friendList = MutableStateFlow<List<UserUiModel>>(emptyList())
     val friendList = _friendList.asStateFlow()
 
-
-    val fetched = MutableLiveData<Boolean>(false)
+    val fetched = MutableLiveData(false)
 
     init {
-        getAllProfile()
+        fetList()
     }
 
+    fun fetList() {
+        getAllProfile()
+        getRecentSessionList()
+        // TODO : 친구 목록 가져오기
+    }
+
+    // 내 프로필 가져오기
     fun fetchProfile() = launch {
         authSessionManager.uid?.let { uid ->
             getProfileUseCase(uid)
@@ -69,8 +77,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    // 전체 유저 목록 가져오기
     fun getAllProfile() = launch {
-
         getAllProfilesUseCase()
             .mapDataResource { list ->
                 list.filter { it.userId != authSessionManager.uid }
@@ -82,7 +90,20 @@ class HomeViewModel @Inject constructor(
             })
     }
 
-    // 세션 참가
+    // 최근 입장한 세션 목록 가져오기
+    fun getRecentSessionList() = launch {
+        authSessionManager.uid.let { uid ->
+            getRecentSessionListUseCase(uid!!).mapDataResource { list ->
+                list.sortedByDescending { it.participationTime }
+                    .map { it.toPresentation() }
+            }
+                .collectDataResource({
+                    _sessionList.value = it
+                })
+        }
+    }
+
+    // 세션 참가 및 기록 저장
     fun participationSession(sessionId: String, hostNickname: String) {
         launch {
             participationSessionUseCase(
@@ -97,14 +118,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // 세션 탈퇴
+    // 세션 이탈 및 기록 삭제
     fun exitSession(sessionId: String) {
         launch {
             exitSessionUseCase(
                 authSessionManager.uid!!,
                 sessionId
             ).collectDataResource({
-                // TODO: 세션 탈퇴 후 처리
+                _sessionList.value = _sessionList.value.filterNot { it.sessionId == sessionId }
             })
         }
     }
