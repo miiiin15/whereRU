@@ -1,17 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="#ffffff"
-    android:padding="8dp">
-
-    <TextView
-        android:id="@+id/session_list_item_info_text"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="session_info"
+            type="com.miiiin15.whereru.presentation.model.JoinedSessionUiModel" />
+    </data>
+    <LinearLayout
+        android:id="@+id/session_list_item_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Session Info"
-        android:textSize="16sp"
-        android:padding="8dp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="8dp"
+        android:background="@drawable/bottom_border">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/session_item_status_image"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/whereru_logo"
+            android:scaleType="centerCrop" />
+
+        <TextView
+                android:id="@+id/session_item_title_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/Medium"
+                android:padding="8dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="@{session_info.hostNickname + `의 세션`}" />
+
+        <TextView
+            android:id="@+id/session_item_started_at_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@{session_info.participationTime}"
+            style="@style/Description" />
+    </LinearLayout>
+</layout>
