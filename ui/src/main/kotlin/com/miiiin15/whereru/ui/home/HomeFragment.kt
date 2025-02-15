@@ -75,12 +75,13 @@ class HomeFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 돌아 왔을 때 내 프로필 정보 조회
+        // 다른 화면 갔다가 돌아 왔을 때
         findNavController().addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.homeFragment) {
                 if (!viewModel.fetched.value!!) {
                     viewModel.fetchProfile()
                 }
+                    viewModel.getRecentSessionList()
             }
         }
 
