@@ -1,4 +1,4 @@
-package com.miiiin15.whereru.domain.usecase
+package com.miiiin15.whereru.domain.usecase.auth
 
 import com.miiiin15.whereru.domain.repository.AuthRepository
 import javax.inject.Inject

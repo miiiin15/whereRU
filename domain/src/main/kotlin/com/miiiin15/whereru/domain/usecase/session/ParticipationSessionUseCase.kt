@@ -1,4 +1,4 @@
-package com.miiiin15.whereru.domain.usecase
+package com.miiiin15.whereru.domain.usecase.session
 
 import javax.inject.Inject
 

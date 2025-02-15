@@ -1,4 +1,4 @@
-package com.miiiin15.whereru.domain.usecase
+package com.miiiin15.whereru.domain.usecase.profile
 
 import com.miiiin15.whereru.data_resource.DataResource
 import com.miiiin15.whereru.domain.model.User

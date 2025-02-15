@@ -1,4 +1,4 @@
-package com.miiiin15.whereru.domain.usecase
+package com.miiiin15.whereru.domain.usecase.livelocation
 
 import com.miiiin15.whereru.domain.model.MyLocationData
 import com.miiiin15.whereru.domain.repository.LiveLocationRepository

@@ -1,6 +1,5 @@
-package com.miiiin15.whereru.domain.usecase
+package com.miiiin15.whereru.domain.usecase.profile
 
-import com.miiiin15.whereru.domain.model.User
 import com.miiiin15.whereru.domain.repository.ProfileRepository
 import javax.inject.Inject
 

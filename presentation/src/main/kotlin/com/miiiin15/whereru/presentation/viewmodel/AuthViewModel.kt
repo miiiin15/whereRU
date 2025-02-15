@@ -3,10 +3,10 @@ package com.miiiin15.whereru.presentation.viewmodel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.miiiin15.whereru.domain.session.AuthSessionManager
-import com.miiiin15.whereru.domain.usecase.LoginUseCase
-import com.miiiin15.whereru.domain.usecase.RegisterUserUseCase
-import com.miiiin15.whereru.domain.usecase.SetProfileUseCase
-import com.miiiin15.whereru.domain.usecase.UpdateLastLoginUseCase
+import com.miiiin15.whereru.domain.usecase.auth.LoginUseCase
+import com.miiiin15.whereru.domain.usecase.auth.RegisterUserUseCase
+import com.miiiin15.whereru.domain.usecase.profile.SetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.profile.UpdateLastLoginUseCase
 import com.miiiin15.whereru.local.model.AuthInfoModel
 import com.miiiin15.whereru.local.pref.PrefUtil
 import com.miiiin15.whereru.presentation.base.BaseViewModel

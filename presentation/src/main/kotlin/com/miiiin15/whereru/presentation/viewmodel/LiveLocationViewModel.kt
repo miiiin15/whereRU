@@ -4,10 +4,10 @@ import com.miiiin15.whereru.common.location.LocationTracker
 import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.model.MyLocationData
 import com.miiiin15.whereru.domain.session.AuthSessionManager
-import com.miiiin15.whereru.domain.usecase.GetProfileUseCase
-import com.miiiin15.whereru.domain.usecase.ObserveSessionUseCase
-import com.miiiin15.whereru.domain.usecase.StopObserveSessionUseCase
-import com.miiiin15.whereru.domain.usecase.UpdateMyLocationUseCase
+import com.miiiin15.whereru.domain.usecase.profile.GetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.session.ObserveSessionUseCase
+import com.miiiin15.whereru.domain.usecase.session.StopObserveSessionUseCase
+import com.miiiin15.whereru.domain.usecase.livelocation.UpdateMyLocationUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
 import com.miiiin15.whereru.presentation.model.LiveLocationUserUiModel
