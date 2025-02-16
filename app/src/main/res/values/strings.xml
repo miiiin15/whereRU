@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">어디야?</string>
+    <string name="channel_id">location_request_channel</string>
+    <string name="channel_description">test</string>
 </resources>
