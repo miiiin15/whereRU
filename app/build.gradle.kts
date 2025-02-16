@@ -68,4 +68,6 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.coroutines.android)
+
+    implementation(libs.firebase.messaging.ktx)
 }
