@@ -33,6 +33,8 @@ interface FirebaseService {
 
     suspend fun updateLastLogin(userId: String, lastLoginAt: Long): Unit
 
+    suspend fun updateFcmToken(userId: String, fcmToken: String): Unit
+
     fun observeSession(
         sessionId: String,
         onSessionUpdated: (LiveLocationResponse) -> Unit,

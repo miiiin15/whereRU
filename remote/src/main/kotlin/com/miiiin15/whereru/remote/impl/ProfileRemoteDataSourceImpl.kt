@@ -24,4 +24,7 @@ class ProfileRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun updateLastLogin(userId: String, lastLoginAt: Long) =
         firebaseService.updateLastLogin(userId, lastLoginAt)
+
+    override suspend fun updateFcmToken(userId: String, fcmToken: String) =
+        firebaseService.updateFcmToken(userId, fcmToken)
 }

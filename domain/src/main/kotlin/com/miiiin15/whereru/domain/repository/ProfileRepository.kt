@@ -11,4 +11,5 @@ interface ProfileRepository {
     fun setProfile(user: User): Flow<DataResource<Unit>>
     fun updateProfileSessionId(userId: String, sessionId:String): Flow<DataResource<Unit>>
     fun updateLastLogin(userId: String, lastLoginAt: Long): Flow<DataResource<Unit>>
+    fun updateFcmToken(userId: String, fcmToken: String): Flow<DataResource<Unit>>
 }

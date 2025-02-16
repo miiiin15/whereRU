@@ -50,5 +50,10 @@ internal class ProfileRepositoryImpl @Inject constructor(
             profileRemoteDataSource.updateLastLogin(userId, lastLoginAt)
         }
 
+    override fun updateFcmToken(userId: String, fcmToken: String): Flow<DataResource<Unit>> =
+        flowDataResource {
+            profileRemoteDataSource.updateFcmToken(userId, fcmToken)
+        }
+
     // TODO : local과 연계
 }

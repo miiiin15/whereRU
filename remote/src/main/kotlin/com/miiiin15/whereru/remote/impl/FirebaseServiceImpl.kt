@@ -191,10 +191,26 @@ class FirebaseServiceImpl @Inject constructor(
      * 마지막 로그인 시간 업데이트
      * **/
     override suspend fun updateLastLogin(userId: String, lastLoginAt: Long) {
-        firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
-            .document(userId)
-            .update("lastLoginAt", lastLoginAt)
-            .await()
+        runCatching {
+            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
+                .document(userId)
+                .update("lastLoginAt", lastLoginAt)
+                .await()
+        }.getOrElse {
+            throw Exception("마지막 로그인 시간 갱신 실패 : ${it.message}")
+        }
+    }
+
+    /**
+     * FCM 토큰 업데이트
+     * **/
+    override suspend fun updateFcmToken(userId: String, fcmToken: String) {
+        runCatching {
+            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
+                .document(userId)
+                .update("fcmToken", fcmToken)
+                .await()
+        }.getOrElse { throw Exception("FCM 토큰 갱신 실패 : ${it.message}") }
     }
 
     /**

@@ -8,4 +8,5 @@ interface ProfileRemoteDataSource {
     suspend fun setProfile(user: ProfileEntity): Unit
     suspend fun updateProfileSessionId(userId: String, sessionId: String): Unit
     suspend fun updateLastLogin(userId: String, lastLoginAt: Long): Unit
+    suspend fun updateFcmToken(userId: String, fcmToken: String): Unit
 }

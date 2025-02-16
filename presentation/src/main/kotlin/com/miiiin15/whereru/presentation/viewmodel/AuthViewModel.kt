@@ -7,6 +7,7 @@ import com.miiiin15.whereru.domain.usecase.auth.LoginUseCase
 import com.miiiin15.whereru.domain.usecase.auth.RegisterUserUseCase
 import com.miiiin15.whereru.domain.usecase.profile.SetProfileUseCase
 import com.miiiin15.whereru.domain.usecase.profile.UpdateLastLoginUseCase
+import com.miiiin15.whereru.domain.usecase.profile.UpdateProfileFCMTokenUseCase
 import com.miiiin15.whereru.local.model.AuthInfoModel
 import com.miiiin15.whereru.local.pref.PrefUtil
 import com.miiiin15.whereru.presentation.base.BaseViewModel
@@ -21,6 +22,7 @@ class AuthViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val registerUserUseCase: RegisterUserUseCase,
     private val setProfileUseCase: SetProfileUseCase,
+    private val updateFcmTokenUseCase: UpdateProfileFCMTokenUseCase,
     private val updateLastLoginUseCase: UpdateLastLoginUseCase,
     private val authSessionManager: AuthSessionManager,
     private val prefUtil: PrefUtil
@@ -58,7 +60,7 @@ class AuthViewModel @Inject constructor(
         launch {
             loginUseCase(email.value!!, password.value!!)
                 .collectDataResource({
-                    updateLastLoginTime(it)
+                    updateInfo(it)
                     _authState.value = true
                     authSessionManager.login(it)
                     if (prefUtil.authInfoModel == null) prefUtil.authInfoModel =
@@ -87,9 +89,12 @@ class AuthViewModel @Inject constructor(
         ).await()
     }
 
-    // 로그인 시간 갱신
-    private suspend fun updateLastLoginTime(uid: String) {
-        updateLastLoginUseCase(uid, System.currentTimeMillis()).await()
+    // 마지막 로그인 시간 , fcmToken 갱신
+    private fun updateInfo(uid: String) {
+        launch {
+            updateFcmTokenUseCase(uid, _fcmToken.value ?: "")
+            updateLastLoginUseCase(uid, System.currentTimeMillis())
+        }
     }
 
     // 자동 로그인
@@ -99,7 +104,7 @@ class AuthViewModel @Inject constructor(
                 loginUseCase(it.email, it.password)
                     .collectDataResource(
                         onSuccess = {
-                            updateLastLoginTime(it)
+                            updateInfo(it)
                             _authState.value = true
                             authSessionManager.login(it)
                         },
