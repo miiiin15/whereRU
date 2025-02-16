@@ -52,4 +52,6 @@ interface FirebaseService {
 
     suspend fun exitSession(userId: String, targetSessionId: String): Unit
 
+    suspend fun getFCMToken(): String
+
 }

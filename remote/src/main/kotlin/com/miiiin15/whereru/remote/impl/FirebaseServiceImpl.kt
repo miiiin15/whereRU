@@ -1,11 +1,14 @@
 package com.miiiin15.whereru.remote.impl
 
+import android.provider.Settings.Global.getString
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.miiiin15.whereru.data.model.JoinedSessionEntity
 import com.miiiin15.whereru.data.model.ProfileEntity
 import com.miiiin15.whereru.data.model.MyLocationEntity
@@ -24,7 +27,8 @@ import javax.inject.Inject
 class FirebaseServiceImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseDatabase: FirebaseDatabase,
-    private val firebaseFirestore: FirebaseFirestore
+    private val firebaseFirestore: FirebaseFirestore,
+    private val firebaseMessaging: FirebaseMessaging
 ) : FirebaseService {
 
     // 세션 리스너를 관리하는 맵
@@ -88,16 +92,17 @@ class FirebaseServiceImpl @Inject constructor(
     /**
      * 최근 참여한 모든 세션 조회
      * **/
-override suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity> {
-    return runCatching {
-        firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
-            .get()
-            .await()
-            .documents.map { document ->
-                document.toObject(JoinedSessionEntity::class.java)?.copy(sessionId = document.id)
-            }.filterNotNull()
-    }.getOrElse { throw Exception("세션 조회 실패: ${it.message}") }
-}
+    override suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity> {
+        return runCatching {
+            firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
+                .get()
+                .await()
+                .documents.map { document ->
+                    document.toObject(JoinedSessionEntity::class.java)
+                        ?.copy(sessionId = document.id)
+                }.filterNotNull()
+        }.getOrElse { throw Exception("세션 조회 실패: ${it.message}") }
+    }
 
     /**
      * 세션 참가
@@ -269,5 +274,14 @@ override suspend fun getRecentSessionList(userId: String): List<JoinedSessionEnt
         }
     }
 
+    /**
+     * FCM 토큰 가져오기
+     * **/
+    override suspend fun getFCMToken(): String {
+        return runCatching {
+            firebaseMessaging.token.await()
+        }.getOrElse { throw Exception("FCM 토큰 가져오기 실패: ${it.message}") }
+    }
 }
+
 
