@@ -31,7 +31,8 @@ internal class ProfileRepositoryImpl @Inject constructor(
                     user.nickname,
                     user.profileImageUrl,
                     user.sessionId,
-                    user.lastLoginAt
+                    user.lastLoginAt,
+                    user.fcmToken
                 )
             )
         }

@@ -10,7 +10,8 @@ class SetProfileUseCase @Inject constructor(private val profileRepository: Profi
         nickname: String,
         profileImageUrl: String? = "",
         sessionId: String? = "",
-        lastLoginAt: Long
+        lastLoginAt: Long,
+        fcmToken: String? =""
     ) =
         profileRepository.setProfile(
             User(
@@ -18,7 +19,8 @@ class SetProfileUseCase @Inject constructor(private val profileRepository: Profi
                 nickname,
                 profileImageUrl,
                 sessionId,
-                lastLoginAt
+                lastLoginAt,
+                fcmToken
             )
         )
 }

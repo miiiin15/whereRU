@@ -9,9 +9,17 @@ data class UserUiModel(
     val nickname: String,
     val profileImageUrl: String?,
     val sessionId: String?,
-    val lastLoginAt: String
+    val lastLoginAt: String,
+    val fcmToken: String? = ""
 )
 
 fun User.toPresentation(): UserUiModel {
-    return UserUiModel(userId, nickname, profileImageUrl, sessionId, lastLoginAt.toRelativeTime())
+    return UserUiModel(
+        userId,
+        nickname,
+        profileImageUrl,
+        sessionId,
+        lastLoginAt.toRelativeTime(),
+        fcmToken
+    )
 }
