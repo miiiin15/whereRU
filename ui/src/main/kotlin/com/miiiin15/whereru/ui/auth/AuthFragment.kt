@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.miiiin15.whereru.presentation.viewmodel.AuthViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
@@ -18,9 +19,15 @@ class AuthFragment :
     ) {
     override val viewModel: AuthViewModel by viewModels()
 
+    private val args: AuthFragmentArgs by navArgs()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         viewModel {
+
+            setFcmToken(args.fcmToken)
+
             authState observe {
                 if (it)
                     findNavController().navigate(AuthFragmentDirections.actionAuthToHome())

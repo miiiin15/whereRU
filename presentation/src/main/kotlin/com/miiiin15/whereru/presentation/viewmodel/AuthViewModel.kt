@@ -29,6 +29,9 @@ class AuthViewModel @Inject constructor(
     private val _authState = MutableStateFlow(false)
     val authState = _authState.asStateFlow()
 
+    private val _fcmToken = MutableStateFlow<String?>(null)
+    val fcmToken = _fcmToken.asStateFlow()
+
     val email = MutableLiveData("")
     val password = MutableLiveData("")
 
@@ -45,6 +48,10 @@ class AuthViewModel @Inject constructor(
         val emailVal = email.value.orEmpty()
         val passwordVal = password.value.orEmpty()
         isButtonEnabled.value = emailVal.isNotBlank() && passwordVal.isNotBlank()
+    }
+
+    fun setFcmToken(token: String?) {
+        _fcmToken.value = token
     }
 
     fun login() {
@@ -75,7 +82,8 @@ class AuthViewModel @Inject constructor(
         setProfileUseCase(
             userId = uid,
             nickname = "유저_${uid.substring(0, 8)}",
-            lastLoginAt = System.currentTimeMillis()
+            lastLoginAt = System.currentTimeMillis(),
+            fcmToken = _fcmToken.value
         ).await()
     }
 

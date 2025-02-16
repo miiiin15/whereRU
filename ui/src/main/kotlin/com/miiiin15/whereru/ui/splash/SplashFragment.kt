@@ -23,16 +23,20 @@ class SplashFragment :
         super.onViewCreated(view, savedInstanceState)
 
         checkAndRequestPermissions()
+        viewModel {
+            fcmToken observe {
+                if (it != null) {
+                    val action = SplashFragmentDirections.actionSplashToAuth(it)
+                    findNavController().navigate(action)
+                }
+
+            }
+        }
     }
 
     private fun checkAndRequestPermissions() {
         PermissionManager.requestPermissionsFromFragment(this) {
-            proceedToNextScreen()
         }
-    }
-
-    private fun proceedToNextScreen() {
-        findNavController().navigate(SplashFragmentDirections.actionSplashToAuth())
     }
 
     override fun handleEvent(event: AppViewModel.Event) {}
