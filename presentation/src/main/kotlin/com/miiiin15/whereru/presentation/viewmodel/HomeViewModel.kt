@@ -3,14 +3,17 @@ package com.miiiin15.whereru.presentation.viewmodel
 import androidx.lifecycle.MutableLiveData
 import com.miiiin15.whereru.common.utils.UUIDUtil
 import com.miiiin15.whereru.data_resource.mapDataResource
+import com.miiiin15.whereru.domain.model.PushMessage
+import com.miiiin15.whereru.domain.model.PushType
 import com.miiiin15.whereru.domain.session.AuthSessionManager
-import com.miiiin15.whereru.domain.usecase.session.CreateSessionUseCase
-import com.miiiin15.whereru.domain.usecase.session.ExitSessionUserCase
+import com.miiiin15.whereru.domain.usecase.fcm.SendPushMessageUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetAllProfilesUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.profile.UpdateProfileSessionIdUseCase
+import com.miiiin15.whereru.domain.usecase.session.CreateSessionUseCase
+import com.miiiin15.whereru.domain.usecase.session.ExitSessionUserCase
 import com.miiiin15.whereru.domain.usecase.session.GetRecentSessionListUseCase
 import com.miiiin15.whereru.domain.usecase.session.ParticipationSessionUseCase
-import com.miiiin15.whereru.domain.usecase.profile.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
 import com.miiiin15.whereru.presentation.model.JoinedSessionUiModel
@@ -31,6 +34,7 @@ class HomeViewModel @Inject constructor(
     private val exitSessionUseCase: ExitSessionUserCase,
     private val createSessionUseCase: CreateSessionUseCase,
     private val updateProfileSessionIdUseCase: UpdateProfileSessionIdUseCase,
+    private val sendPushMessageUseCase: SendPushMessageUseCase,
     private val authSessionManager: AuthSessionManager,
 ) : BaseViewModel<HomeViewModel.Event>() {
 
@@ -156,6 +160,26 @@ class HomeViewModel @Inject constructor(
     private suspend fun updateSessionID(uid: String, sessionId: String) {
         updateProfileSessionIdUseCase(uid, sessionId).await()
         authSessionManager.setTargetSessionId(sessionId)
+    }
+
+    // 위치 공유 세션 개설 요청 FCM 전송
+    fun sendRequestLocationPushMessage(userData: UserUiModel) {
+        launch {
+
+            val message = PushMessage(
+                type = PushType.REQUEST_LOCATION,
+                fromUserId = _myProfile.value!!.userId,
+                fromNickname = _myProfile.value!!.nickname,
+                toUserId = userData.userId,
+                sessionId = "",
+                timestamp = System.currentTimeMillis()
+            )
+
+            sendPushMessageUseCase(userData.fcmToken!!, message)
+                .collectDataResource({
+                    // TODO : FCM 전송 성공 시 처리
+                })
+        }
     }
 
     // 트리거 정리

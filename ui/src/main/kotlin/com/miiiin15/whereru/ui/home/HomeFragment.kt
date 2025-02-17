@@ -27,46 +27,21 @@ class HomeFragment :
 
     private val sessionListAdapter: SessionListAdapter by lazy {
         SessionListAdapter(object : OnSessionItemClickListener {
-            override fun onSessionItemClick(session: JoinedSessionUiModel) {
-                showCustomBottomSheet(
-                    "${session.hostNickname}님의 세션\n최근 입장 시간 : ${session.participationTime}",
-                    "삭제",
-                    "재입장",
-                    onLeftButtonClick = {
-                        viewModel.exitSession(session.sessionId)
-                    },
-                    onRightButtonClick = {
-                        viewModel.participationSession(session.sessionId, session.hostNickname)
-                    }
-                )
-            }
+            override fun onSessionItemClick(session: JoinedSessionUiModel) =
+                recentSessionClickAction(session)
         }
         )
     }
     private val userListAdapter: UserListAdapter by lazy {
         UserListAdapter(object : OnUserItemClickListener {
-            override fun onUserItemClick(user: UserUiModel) {
-                showCustomBottomSheet(
-                    "${user.nickname}\n마지막 접속 : ${user.lastLoginAt}",
-                    "친구 추가",
-                    "세션 입장",
-                    onLeftButtonClick = {
-                        // TODO : 친구추가 기능 구현
-                    },
-                    onRightButtonClick = {
-                        if (user.sessionId.isNullOrBlank()) {
-                            showCustomAlert("위치를 공유하고 있지 않습니다.")
-                        } else {
-                            viewModel.participationSession(user.sessionId!!, user.nickname!!)
-                        }
-                    }
-                )
-            }
+            override fun onUserItemClick(user: UserUiModel) =
+                allUserClickAction(user)
         })
     }
     private val friendListAdapter: UserListAdapter by lazy {
         UserListAdapter(object : OnUserItemClickListener {
             override fun onUserItemClick(user: UserUiModel) {
+                // TODO : 친구 목록 아이템 클릭 액션
             }
         })
     }
@@ -81,7 +56,7 @@ class HomeFragment :
                 if (!viewModel.fetched.value!!) {
                     viewModel.fetchProfile()
                 }
-                    viewModel.getRecentSessionList()
+                viewModel.getRecentSessionList()
             }
         }
 
@@ -199,6 +174,48 @@ class HomeFragment :
                 }
             }
         }
+    }
+
+    private fun recentSessionClickAction(session: JoinedSessionUiModel) {
+        showCustomBottomSheet(
+            "${session.hostNickname}님의 세션\n최근 입장 시간 : ${session.participationTime}",
+            "삭제",
+            "재입장",
+            onLeftButtonClick = {
+                viewModel.exitSession(session.sessionId)
+            },
+            onRightButtonClick = {
+                viewModel.participationSession(session.sessionId, session.hostNickname)
+            }
+        )
+    }
+
+    private fun allUserClickAction(user: UserUiModel) {
+        val notOpenedSession = user.sessionId.isNullOrBlank()
+        val rightButtonText = if (notOpenedSession) "공유 요청" else "세션 입장"
+        val sessionStateText = if (notOpenedSession) {
+            "위치 공유 세션 : Closed"
+        } else {
+            "위치 공유 세션 : Open"
+        }
+
+        showCustomBottomSheet(
+            "${user.nickname}\n마지막 접속 : ${user.lastLoginAt}\n${sessionStateText}",
+            "친구 추가",
+            rightButtonText,
+            onLeftButtonClick = {
+                // TODO : 친구추가 기능 구현
+            },
+            onRightButtonClick = {
+                if (notOpenedSession) {
+                    showCustomAlert("위치 공유를 요청 하시겠습니까?") {
+                        viewModel.sendRequestLocationPushMessage(user)
+                    }
+                } else {
+                    viewModel.participationSession(user.sessionId!!, user.nickname!!)
+                }
+            }
+        )
     }
 
     override fun handleEvent(event: HomeViewModel.Event) {
