@@ -1,8 +1,14 @@
 package com.miiiin15.whereru.domain.repository
 
 import com.miiiin15.whereru.data_resource.DataResource
+import com.miiiin15.whereru.domain.model.PushMessage
 import kotlinx.coroutines.flow.Flow
 
 interface FCMRepository {
     fun getFCMToken(): Flow<DataResource<String>>
+
+   fun sendPushMessage(
+       token: String,
+       message: PushMessage,
+   ): Flow<DataResource<Boolean>>
 }
