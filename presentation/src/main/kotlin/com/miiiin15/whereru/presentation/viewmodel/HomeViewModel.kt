@@ -5,6 +5,7 @@ import com.miiiin15.whereru.common.utils.UUIDUtil
 import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.model.PushMessage
 import com.miiiin15.whereru.domain.model.PushType
+import com.miiiin15.whereru.domain.model.ResponseType
 import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.fcm.SendPushMessageUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetAllProfilesUseCase
@@ -17,6 +18,7 @@ import com.miiiin15.whereru.domain.usecase.session.ParticipationSessionUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
 import com.miiiin15.whereru.presentation.model.JoinedSessionUiModel
+import com.miiiin15.whereru.presentation.model.PushMessageUiModel
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.model.toPresentation
 import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
@@ -165,11 +167,11 @@ class HomeViewModel @Inject constructor(
     // 위치 공유 세션 개설 요청 FCM 전송
     fun sendRequestLocationPushMessage(userData: UserUiModel) {
         launch {
-
             val message = PushMessage(
                 type = PushType.REQUEST_LOCATION,
                 fromUserId = _myProfile.value!!.userId,
                 fromNickname = _myProfile.value!!.nickname,
+                fromToken = _myProfile.value!!.fcmToken!!,
                 toUserId = userData.userId,
                 sessionId = "",
                 timestamp = System.currentTimeMillis()

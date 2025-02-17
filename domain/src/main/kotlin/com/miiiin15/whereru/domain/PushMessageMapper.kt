@@ -16,9 +16,10 @@ object PushMessageMapper {
     fun mapToPushMessage(data: Map<String, String>): PushMessage? {
         val type = PushType.from(data["type"]) ?: return null
         val fromUserId = data["fromUserId"] ?: return null
+        val fromNickname = data["fromNickname"] ?: ""
+        val fromToken = data["fromToken"] ?: ""
         val toUserId = data["toUserId"] ?: return null
         val sessionId = data["sessionId"] ?: return null
-        val fromNickname = data["fromNickname"] ?: ""
         val response = ResponseType.from(data["response"])
         val timestamp = data["timestamp"]?.toLongOrNull() ?: System.currentTimeMillis()
 
@@ -26,6 +27,7 @@ object PushMessageMapper {
             type = type,
             fromUserId = fromUserId,
             fromNickname = fromNickname,
+            fromToken = fromToken,
             toUserId = toUserId,
             sessionId = sessionId,
             response = response,
