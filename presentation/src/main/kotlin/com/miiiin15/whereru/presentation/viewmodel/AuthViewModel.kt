@@ -60,7 +60,8 @@ class AuthViewModel @Inject constructor(
         launch {
             loginUseCase(email.value!!, password.value!!)
                 .collectDataResource({
-                    updateInfo(it)
+                    updateFcmToken(it)
+                    updateLastLogin(it)
                     _authState.value = true
                     authSessionManager.login(it)
                     if (prefUtil.authInfoModel == null) prefUtil.authInfoModel =
@@ -89,13 +90,17 @@ class AuthViewModel @Inject constructor(
         ).await()
     }
 
-    // 마지막 로그인 시간 , fcmToken 갱신
-    private fun updateInfo(uid: String) {
-        launch {
-            updateFcmTokenUseCase(uid, _fcmToken.value ?: "")
-            updateLastLoginUseCase(uid, System.currentTimeMillis())
-        }
+
+    // 프로필 fcmToken 업데이트
+    suspend  fun updateFcmToken(uid: String){
+            updateFcmTokenUseCase(uid, _fcmToken.value ?: "").await()
     }
+
+    // 프로필 마지막 로그인 업데이트
+    suspend  fun updateLastLogin(uid: String){
+            updateLastLoginUseCase(uid, System.currentTimeMillis()).await()
+    }
+
 
     // 자동 로그인
     private fun autoLogin() {
@@ -104,7 +109,8 @@ class AuthViewModel @Inject constructor(
                 loginUseCase(it.email, it.password)
                     .collectDataResource(
                         onSuccess = {
-                            updateInfo(it)
+                            updateFcmToken(it)
+                            updateLastLogin(it)
                             _authState.value = true
                             authSessionManager.login(it)
                         },
