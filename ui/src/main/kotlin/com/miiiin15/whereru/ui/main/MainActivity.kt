@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.miiiin15.whereru.common.utils.PermissionManager
+import com.miiiin15.whereru.presentation.fcm.FCMMessageMapper
+import com.miiiin15.whereru.presentation.fcm.FCMMessageHolder
 import com.miiiin15.whereru.ui.R
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,8 +23,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         PermissionManager.askNotificationPermission(this, requestPermissionLauncher)
+        handleFcmPushIntent()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
@@ -40,6 +42,19 @@ class MainActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+    private fun handleFcmPushIntent() {
+        FCMMessageMapper.fromIntent(intent)?.let { pushMessage ->
+            FCMMessageHolder.set(pushMessage)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent != null) {
+            setIntent(intent)
+            handleFcmPushIntent()
+        }
+    }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()

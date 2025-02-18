@@ -1,6 +1,8 @@
 package com.miiiin15.whereru.ui.home
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -10,7 +12,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.miiiin15.whereru.presentation.fcm.FCMMessageHolder
 import com.miiiin15.whereru.presentation.model.JoinedSessionUiModel
+import com.miiiin15.whereru.presentation.model.PushMessageUiModel
+import com.miiiin15.whereru.presentation.model.PushUiType
+import com.miiiin15.whereru.presentation.model.ResponseUiType
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
 import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel
@@ -45,7 +51,6 @@ class HomeFragment :
             }
         })
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +90,7 @@ class HomeFragment :
         }
 
         viewModel {
+
             myProfile observe { my ->
                 if (my.nickname != null) {
                     binding.homeTitleText.apply {
@@ -111,6 +117,13 @@ class HomeFragment :
         }
 
         setViewPager()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        FCMMessageHolder.consume()?.let { message ->
+            fcmAction(message)
+        }
     }
 
 
@@ -216,6 +229,59 @@ class HomeFragment :
                 }
             }
         )
+    }
+
+    private fun fcmAction(message: PushMessageUiModel) {
+
+        // 포그라운드에서 수신한 PushMessage 삭제
+        val notificationManager =
+            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(message.notificationId)
+
+        when (message.type) {
+            // 위치 공유 요청
+            PushUiType.REQUEST_LOCATION -> {
+                showCustomBottomSheet(
+                    "${message.fromNickname}님이 ${message.timestamp} 위치 공유 요청을 보냈습니다.\n수락하시겠습니까?",
+                    "거절",
+                    "수락",
+                    onLeftButtonClick = {
+                        viewModel.sendResponsePushMessage(message, false)
+                    },
+                    onRightButtonClick = {
+                        viewModel.checkSessionID()
+                            viewModel.sendResponsePushMessage(message, true)
+
+                    }
+                )
+            }
+
+            // 위치 공유 응답
+            PushUiType.RESPONSE_LOCATION -> {
+                message.response?.let {
+                    when (it) {
+                        ResponseUiType.ACCEPT -> {
+                            showCustomAlert("${message.fromNickname}님이 위치 공유를 수락했습니다.\n 참여 하시겠습니까?") {
+                                viewModel.participationSession(
+                                    message.sessionId,
+                                    message.fromNickname
+                                )
+                            }
+                        }
+
+                        ResponseUiType.DECLINE -> {
+                            showCustomAlert("${message.fromNickname}님이 위치 공유를 거절했습니다.")
+                        }
+                    }
+                } ?: run {
+                    showCustomAlert("응답을 받을 수 없습니다.")
+                }
+            }
+
+            // 세션 종료
+            PushUiType.CANCEL_SESSION -> {}
+        }
+
     }
 
     override fun handleEvent(event: HomeViewModel.Event) {

@@ -137,12 +137,13 @@ class HomeViewModel @Inject constructor(
     }
 
     // 세션 ID 체크 후 네비게이션 트리거
-    fun checkSessionID() {
+    fun checkSessionID(callback: (() -> Unit)? = null) {
         launch {
             if (authSessionManager.isEmptyTargetSessionId()) {
                 createSession()
             }
             _navigationTarget.value = HomeNavigationTarget.ToLiveLocation
+            callback?.invoke()
         }
     }
 
@@ -178,6 +179,33 @@ class HomeViewModel @Inject constructor(
             )
 
             sendPushMessageUseCase(userData.fcmToken!!, message)
+                .collectDataResource({
+                    // TODO : FCM 전송 성공 시 처리
+                })
+        }
+    }
+
+    // 위치 공유 세션 수락/거절 FCM 전송
+    fun sendResponsePushMessage(receivedMessage: PushMessageUiModel, accept: Boolean) {
+        val responseType = if (accept) {
+            ResponseType.ACCEPT
+        } else {
+            ResponseType.DECLINE
+        }
+
+        launch {
+            val message = PushMessage(
+                type = PushType.RESPONSE_LOCATION,
+                fromUserId = _myProfile.value!!.userId,
+                fromNickname = _myProfile.value!!.nickname,
+                fromToken = _myProfile.value!!.fcmToken!!,
+                toUserId = receivedMessage.fromUserId,
+                sessionId = authSessionManager.targetSessionId!!,
+                response = responseType,
+                timestamp = System.currentTimeMillis()
+            )
+
+            sendPushMessageUseCase(receivedMessage.fromToken, message)
                 .collectDataResource({
                     // TODO : FCM 전송 성공 시 처리
                 })
