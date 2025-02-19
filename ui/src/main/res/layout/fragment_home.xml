@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:background="@color/white"
         tools:context=".ui.home.HomeFragment">
 
         <com.facebook.shimmer.ShimmerFrameLayout
@@ -56,14 +57,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.motion.widget.MotionLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/home_category_motion_layout"
             android:background="@drawable/bottom_border"
             android:paddingHorizontal="@dimen/padding_horizontal"
-            android:paddingVertical="8dp"
-            app:layoutDescription="@xml/scene_rotate_refresh">
+            android:paddingVertical="8dp">
 
             <TextView
                 android:id="@+id/home_category_recent_text"
@@ -100,15 +99,26 @@
                 app:layout_constraintStart_toEndOf="@id/home_category_all_text"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/home_refresh_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/icon_refresh"
+            <androidx.constraintlayout.motion.widget.MotionLayout
+                android:id="@+id/home_category_motion_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layoutDescription="@xml/scene_rotate_refresh"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.motion.widget.MotionLayout>
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/home_refresh_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/icon_refresh"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </androidx.constraintlayout.motion.widget.MotionLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/home_pager_view"
