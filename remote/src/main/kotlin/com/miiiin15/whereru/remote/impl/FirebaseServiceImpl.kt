@@ -246,7 +246,7 @@ class FirebaseServiceImpl @Inject constructor(
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                if (!snapshot.exists()) onError(Exception("세션 정보 파싱 실패"))
+                if (!snapshot.exists()) onError(Exception("세션 정보가 유효하지 않습니다."))
 
                 // 중간 노드의 PK 역할을 하는 uid 까지 포함하기 위한 직렬화 작업
                 val hostUid = snapshot.child("host_uid").getValue(String::class.java) ?: ""
