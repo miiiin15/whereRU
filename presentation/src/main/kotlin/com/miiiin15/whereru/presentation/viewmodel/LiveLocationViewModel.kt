@@ -84,7 +84,14 @@ class LiveLocationViewModel @Inject constructor(
                         _users.value = newUsers
                         event(Event.UsersUpdated(newUsers))
                     },
-                    onError = { showAlert("${it.message}") }
+                    onError = {
+                        showAlert("${it.message}")
+                        if (_sessionInfo.value?.hostId.isNullOrBlank()) {
+                            setObserveSessionState(false)
+                            setTrackingState(false)
+                            return@observeSessionUseCase
+                        }
+                    }
                 )
             }
         } else {
@@ -115,6 +122,12 @@ class LiveLocationViewModel @Inject constructor(
 
     private fun updateMyLocation(location: MyLocationData) {
         if (!_isWantTransmit.value) return
+        if (_sessionInfo.value?.hostId.isNullOrBlank()) {
+            showAlert("세션이 존재하지 않습니다.")
+            setObserveSessionState(false)
+            setTrackingState(false)
+            return
+        }
         launch {
             _myProfile.value?.nickname.let {
                 updateMyLocationUseCase(
@@ -131,6 +144,7 @@ class LiveLocationViewModel @Inject constructor(
     }
 
     fun deleteMyLocation(callback: () -> Unit) {
+        setTrackingState(false)
         launch {
             deleteMyLocationUseCase(
                 authSessionManager.targetSessionId!!,

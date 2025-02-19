@@ -33,6 +33,11 @@ class LiveLocationFragment :
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (viewModel.isHost.value ) {
+                showCustomAlert("세션을 종료하시겠습니까?") {
+
+                }
+            } else
             showCustomAlert("세션을 종료하시겠습니까?") {
                 viewModel.deleteMyLocation {
                     requireActivity().supportFragmentManager.popBackStack()
