@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +23,7 @@ import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
 import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
+import com.miiiin15.whereru.ui.component.SimpleMotionLayoutListener
 import com.miiiin15.whereru.ui.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -87,6 +89,22 @@ class HomeFragment :
             homeNavigateLocationButton.setOnClickListener {
                 viewModel.checkSessionID()
             }
+
+            homeRefreshButton.setOnClickListener {
+                binding.homeCategoryMotionLayout.transitionToEnd()
+                when (currentCategory) {
+                    Category.RECENT -> viewModel.getRecentSessionList()
+                    Category.ALL -> viewModel.getAllProfile()
+                    Category.FRIEND -> {}
+                }
+            }
+
+            homeCategoryMotionLayout.addTransitionListener(object : SimpleMotionLayoutListener() {
+                override fun onTransitionCompleted(parent: MotionLayout, currentId: Int) {
+                    homeCategoryMotionLayout.progress = 0f
+                }
+            }
+            )
         }
 
         viewModel {
@@ -250,7 +268,7 @@ class HomeFragment :
                     },
                     onRightButtonClick = {
                         viewModel.checkSessionID()
-                            viewModel.sendResponsePushMessage(message, true)
+                        viewModel.sendResponsePushMessage(message, true)
 
                     }
                 )
