@@ -30,4 +30,5 @@ dependencies {
     implementation(libs.maps.ktx)
 
     implementation(libs.shimmer)
+    implementation(libs.colorpickerpreference)
 }
