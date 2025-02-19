@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -30,6 +32,13 @@ class LiveLocationFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            showCustomAlert("세션을 종료하시겠습니까?") {
+                viewModel.deleteMyLocation {
+                    requireActivity().supportFragmentManager.popBackStack()
+                }
+            }
+        }
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -64,6 +73,17 @@ class LiveLocationFragment :
         viewModel {
             users observe { users ->
                 markerManager.updateMarkers(users)
+
+                if (markerManager.removedUserNickname != null) {
+                    Toast.makeText(
+                        requireContext(),
+                        "${markerManager.removedUserNickname}님이 세션을 나가셨습니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    markerManager.removedUserNickname = null
+                }
+
+
                 binding.liveLocationMarkerCountText.text = "${users.size}"
             }
             myLocation observe {

@@ -4,6 +4,7 @@ import com.miiiin15.whereru.common.location.LocationTracker
 import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.model.MyLocationData
 import com.miiiin15.whereru.domain.session.AuthSessionManager
+import com.miiiin15.whereru.domain.usecase.livelocation.DeleteMyLocationUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetProfileUseCase
 import com.miiiin15.whereru.domain.usecase.session.ObserveSessionUseCase
 import com.miiiin15.whereru.domain.usecase.session.StopObserveSessionUseCase
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class LiveLocationViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val updateMyLocationUseCase: UpdateMyLocationUseCase,
+    private val deleteMyLocationUseCase: DeleteMyLocationUseCase,
     private val observeSessionUseCase: ObserveSessionUseCase,
     private val stopObserveSessionUseCase: StopObserveSessionUseCase,
     private val locationTracker: LocationTracker,
@@ -128,6 +130,20 @@ class LiveLocationViewModel @Inject constructor(
         }
     }
 
+    fun deleteMyLocation(callback: () -> Unit) {
+        launch {
+            deleteMyLocationUseCase(
+                authSessionManager.targetSessionId!!,
+                authSessionManager.uid!!
+            ).collectDataResource(
+                onSuccess = {
+                    callback.invoke()
+                },
+                loadingEnable = false
+            )
+        }
+    }
+
     fun currentMyLocation() {
         launch {
             val loc = locationTracker.getCurrentLocation()
@@ -143,7 +159,7 @@ class LiveLocationViewModel @Inject constructor(
         setTrackingState(false)
     }
 
-    sealed class Event : ViewEvent{
+    sealed class Event : ViewEvent {
         data class UsersUpdated(val users: Map<String, LiveLocationUserUiModel>) : Event()
     }
 }
