@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="view"
+            type="com.miiiin15.whereru.ui.profile.ProfileFragment" />
+
+        <variable
+            name="vm"
+            type="com.miiiin15.whereru.presentation.viewmodel.ProfileViewModel" />
+
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/padding_horizontal"
+        tools:context=".ui.profile.ProfileFragment">
+
+        <!-- 로그인 타이틀 -->
+        <TextView
+            android:id="@+id/profile_title_text"
+            style="@style/Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_top_title"
+            android:layout_marginBottom="@dimen/margin_title_to_content"
+            android:text="프로필 설정"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 닫기 버튼 -->
+        <ImageButton
+            android:id="@+id/profile_close_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="@dimen/margin_top_title"
+            android:background="@drawable/icon_close"
+            android:contentDescription="닫기 버튼"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 입력 필드 컨테이너 -->
+        <LinearLayout
+            android:id="@+id/profile_input_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/profile_button_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profile_title_text">
+
+            <!-- 컬러 미리보기 동그라미 -->
+            <View
+                android:id="@+id/profile_color_preview"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="32dp"
+                android:background="@color/gray1"
+                android:elevation="8dp"
+                android:shape="oval" />
+
+            <!-- 닉네임 입력 -->
+            <EditText
+            android:id="@+id/profile_nickname_input"
+            style="@style/InputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_input_field"
+            android:hint="닉네임 입력"
+            android:text="@={vm.nickname}"
+            android:inputType="text"
+            android:maxLength="9" />
+
+        </LinearLayout>
+
+        <!-- 버튼 컨테이너 -->
+        <LinearLayout
+            android:id="@+id/profile_button_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_bottom_button"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- 컬러 피커 버튼 -->
+            <Button
+                android:id="@+id/profile_color_picker_button"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_input_field"
+                android:text="컬러 선택" />
+            <!-- 프로필 수정 -->
+            <Button
+                android:id="@+id/profile_confirm_button"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="프로필 저장" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
