@@ -73,6 +73,18 @@ class FirebaseServiceImpl @Inject constructor(
     }
 
     /**
+     * 내 위치 삭제
+     * **/
+    override suspend fun deleteMyLocation(
+        sessionId: String,
+        uid: String
+    ): Unit {
+        firebaseDatabase.getReference("${FirebasePaths.LOCATION_SESSIONS}/$sessionId/users/$uid")
+            .removeValue()
+            .await()
+    }
+
+    /**
      * 세션 생성
      * **/
     override suspend fun createSession(sessionId: String, hostId: String): Unit {

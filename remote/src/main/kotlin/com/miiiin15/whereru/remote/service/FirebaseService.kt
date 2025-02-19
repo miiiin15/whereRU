@@ -21,6 +21,8 @@ interface FirebaseService {
         location: MyLocationEntity
     ): Unit
 
+    suspend fun deleteMyLocation(sessionId: String, uid: String): Unit
+
     suspend fun getAllProfiles(): List<ProfileEntity>
 
     suspend fun getProfile(userId: String): ProfileEntity

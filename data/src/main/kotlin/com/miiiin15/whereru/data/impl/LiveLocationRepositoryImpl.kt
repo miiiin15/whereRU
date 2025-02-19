@@ -32,5 +32,10 @@ internal class LiveLocationRepositoryImpl @Inject constructor(
         )
     }
 
+    override fun deleteMyLocation(sessionId: String, userId: String): Flow<DataResource<Unit>> =
+        flowDataResource {
+            liveLocationRemoteDataSource.deleteMyLocation(sessionId, userId)
+        }
+
     // TODO : local과 연계
 }

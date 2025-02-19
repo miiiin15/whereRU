@@ -12,4 +12,6 @@ interface LiveLocationRepository {
         nickname: String,
         location: MyLocationData
     ): Flow<DataResource<Unit>>
+
+    fun deleteMyLocation(sessionId: String, userId: String): Flow<DataResource<Unit>>
 }

@@ -12,4 +12,9 @@ interface LiveLocationRemoteDataSource {
         location: MyLocationEntity
     ): Unit
 
+    suspend fun deleteMyLocation(
+        sessionId: String,
+        userId: String
+    ): Unit
+
 }
