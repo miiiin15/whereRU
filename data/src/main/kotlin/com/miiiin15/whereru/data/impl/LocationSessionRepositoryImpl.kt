@@ -18,6 +18,11 @@ internal class LocationSessionRepositoryImpl @Inject constructor(
             locationRemoteDataSource.createSession(sessionId, hostId)
         }
 
+    override fun deleteSession(sessionId: String): Flow<DataResource<Unit>> =
+        flowDataResource {
+            locationRemoteDataSource.deleteSession(sessionId)
+        }
+
     override fun observeSession(
         sessionId: String,
         onSessionUpdated: (LiveLocationSession) -> Unit,

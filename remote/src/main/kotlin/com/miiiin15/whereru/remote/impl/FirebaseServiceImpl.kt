@@ -102,6 +102,15 @@ class FirebaseServiceImpl @Inject constructor(
     }
 
     /**
+     * 세션 삭제
+     * **/
+    override suspend fun deleteSession(sessionId: String): Unit {
+        firebaseDatabase.getReference("${FirebasePaths.LOCATION_SESSIONS}/$sessionId")
+            .removeValue()
+            .await()
+    }
+
+    /**
      * 최근 참여한 모든 세션 조회
      * **/
     override suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity> {

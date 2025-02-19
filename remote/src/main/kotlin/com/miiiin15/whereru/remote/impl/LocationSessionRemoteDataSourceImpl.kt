@@ -12,6 +12,9 @@ class LocationSessionRemoteDataSourceImpl @Inject constructor(
     override suspend fun createSession(sessionId: String, hostId: String): Unit =
         firebaseService.createSession(sessionId, hostId)
 
+    override suspend fun deleteSession(sessionId: String): Unit =
+        firebaseService.deleteSession(sessionId)
+
     override fun observeSession(
         sessionId: String,
         onSessionUpdated: (LiveLocationEntity) -> Unit,

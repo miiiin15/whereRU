@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 interface LocationSessionRepository {
     fun createSession(sessionId: String, hostId: String): Flow<DataResource<Unit>>
 
+    fun deleteSession(sessionId: String): Flow<DataResource<Unit>>
+
     fun observeSession(
         sessionId: String,
         onSessionUpdated: (LiveLocationSession) -> Unit,

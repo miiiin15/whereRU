@@ -8,6 +8,8 @@ interface LocationSessionRemoteDataSource {
 
     suspend fun createSession(sessionId: String, hostId: String): Unit
 
+    suspend fun deleteSession(sessionId: String): Unit
+
     fun observeSession(
         sessionId: String,
         onSessionUpdated: (LiveLocationEntity) -> Unit,

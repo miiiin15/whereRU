@@ -14,6 +14,8 @@ interface FirebaseService {
 
     suspend fun createSession(sessionId: String, hostId: String): Unit
 
+    suspend fun deleteSession(sessionId: String): Unit
+
     suspend fun updateMyLocation(
         sessionId: String,
         uid: String,
