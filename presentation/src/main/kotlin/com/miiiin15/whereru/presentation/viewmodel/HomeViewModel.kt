@@ -12,6 +12,7 @@ import com.miiiin15.whereru.domain.usecase.profile.GetAllProfilesUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetProfileUseCase
 import com.miiiin15.whereru.domain.usecase.profile.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.domain.usecase.session.CreateSessionUseCase
+import com.miiiin15.whereru.domain.usecase.session.DeleteSessionUseCase
 import com.miiiin15.whereru.domain.usecase.session.ExitSessionUserCase
 import com.miiiin15.whereru.domain.usecase.session.GetRecentSessionListUseCase
 import com.miiiin15.whereru.domain.usecase.session.ParticipationSessionUseCase
@@ -35,6 +36,7 @@ class HomeViewModel @Inject constructor(
     private val participationSessionUseCase: ParticipationSessionUseCase,
     private val exitSessionUseCase: ExitSessionUserCase,
     private val createSessionUseCase: CreateSessionUseCase,
+    private val deleteSessionUseCase: DeleteSessionUseCase,
     private val updateProfileSessionIdUseCase: UpdateProfileSessionIdUseCase,
     private val sendPushMessageUseCase: SendPushMessageUseCase,
     private val authSessionManager: AuthSessionManager,
@@ -163,6 +165,19 @@ class HomeViewModel @Inject constructor(
     private suspend fun updateSessionID(uid: String, sessionId: String) {
         updateProfileSessionIdUseCase(uid, sessionId).await()
         authSessionManager.setTargetSessionId(sessionId)
+
+    }
+
+    // 세션 삭제
+    fun deleteSession() {
+        val sessionId = authSessionManager.targetSessionId
+        if (sessionId.isNullOrBlank()) return
+        launch {
+            deleteSessionUseCase(sessionId).collectDataResource({
+                updateSessionID(authSessionManager.uid!!, "")
+                _myProfile.value = _myProfile.value?.copy(sessionId = "")
+            })
+        }
     }
 
     // 위치 공유 세션 개설 요청 FCM 전송

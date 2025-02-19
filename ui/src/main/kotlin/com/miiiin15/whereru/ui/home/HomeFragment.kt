@@ -87,7 +87,18 @@ class HomeFragment :
             vm = viewModel
 
             homeNavigateLocationButton.setOnClickListener {
-                viewModel.checkSessionID()
+                val sessionIdDisable = viewModel.myProfile.value?.sessionId.isNullOrBlank()
+                showCustomBottomSheet(
+                    "위치를 ${if (sessionIdDisable) "공유 하지 않고 있습니다." else "공유 중 입니다."}",
+                    "세션 삭제",
+                    "세션 ${if (sessionIdDisable) "생성" else "입장"}",
+                    onLeftButtonClick = {
+                        showDeleteSessionAlert()
+                    },
+                    onRightButtonClick = {
+                        viewModel.checkSessionID()
+                    }
+                )
             }
 
             homeRefreshButton.setOnClickListener {
@@ -108,7 +119,6 @@ class HomeFragment :
         }
 
         viewModel {
-
             myProfile observe { my ->
                 if (my.nickname != null) {
                     binding.homeTitleText.apply {
@@ -207,6 +217,16 @@ class HomeFragment :
         }
     }
 
+    private fun showDeleteSessionAlert() {
+        if (viewModel.myProfile.value?.sessionId.isNullOrBlank()) {
+            showCustomAlert("공유중인 세션이 없습니다.")
+            return
+        }
+        showCustomAlert("세션을 삭제 하시겠습니까?") {
+            viewModel.deleteSession()
+        }
+    }
+
     private fun recentSessionClickAction(session: JoinedSessionUiModel) {
         showCustomBottomSheet(
             "${session.hostNickname}님의 세션\n최근 입장 시간 : ${session.participationTime}",
@@ -267,8 +287,9 @@ class HomeFragment :
                         viewModel.sendResponsePushMessage(message, false)
                     },
                     onRightButtonClick = {
-                        viewModel.checkSessionID()
-                        viewModel.sendResponsePushMessage(message, true)
+                        viewModel.checkSessionID {
+                            viewModel.sendResponsePushMessage(message, true)
+                        }
 
                     }
                 )
