@@ -50,6 +50,9 @@ class LiveLocationViewModel @Inject constructor(
     private val _users = MutableStateFlow<Map<String, LiveLocationUserUiModel>>(emptyMap())
     val users = _users.asStateFlow()
 
+    private val _isHost = MutableStateFlow(false)
+    val isHost = _isHost.asStateFlow()
+
     init {
         fetchProfile()
     }
@@ -60,6 +63,7 @@ class LiveLocationViewModel @Inject constructor(
                 .mapDataResource { it.toPresentation() }
                 .collectDataResource({ profile ->
                     _myProfile.value = profile
+                    _isHost.value = authSessionManager.uid == _sessionInfo.value?.hostId
                 })
         }
     }

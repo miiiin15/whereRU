@@ -33,16 +33,16 @@ class LiveLocationFragment :
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if (viewModel.isHost.value ) {
-                showCustomAlert("세션을 종료하시겠습니까?") {
-
-                }
-            } else
-            showCustomAlert("세션을 종료하시겠습니까?") {
-                viewModel.deleteMyLocation {
+            showCustomAlert("세션을 이탈하시겠습니까?") {
+                if (viewModel.isHost.value) {
                     requireActivity().supportFragmentManager.popBackStack()
+                } else {
+                    viewModel.deleteMyLocation {
+                        requireActivity().supportFragmentManager.popBackStack()
+                    }
                 }
             }
+
         }
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
