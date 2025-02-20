@@ -17,6 +17,7 @@ internal class LiveLocationRepositoryImpl @Inject constructor(
         sessionId: String,
         userId: String,
         nickname: String,
+        profileImageUrl: String?,
         location: MyLocationData
     ): Flow<DataResource<Unit>> = flowDataResource {
 
@@ -24,6 +25,7 @@ internal class LiveLocationRepositoryImpl @Inject constructor(
             sessionId,
             userId,
             nickname,
+            profileImageUrl,
             MyLocationEntity(
                 latitude = location.latitude,
                 longitude = location.longitude,

@@ -9,7 +9,8 @@ class UpdateMyLocationUseCase @Inject constructor(private val liveLocationReposi
         sessionId: String,
         userId: String,
         nickname: String,
+        profileImageUrl: String?,
         location: MyLocationData
     ) =
-        liveLocationRepository.updateMyLocation(sessionId, userId, nickname, location)
+        liveLocationRepository.updateMyLocation(sessionId, userId, nickname, profileImageUrl,location)
 }

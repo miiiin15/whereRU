@@ -20,6 +20,7 @@ interface FirebaseService {
         sessionId: String,
         uid: String,
         nickname: String,
+        profileImageUrl: String?,
         location: MyLocationEntity
     ): Unit
 

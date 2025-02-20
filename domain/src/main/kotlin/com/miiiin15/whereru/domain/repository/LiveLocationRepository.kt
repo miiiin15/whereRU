@@ -10,6 +10,7 @@ interface LiveLocationRepository {
         sessionId: String,
         userId: String,
         nickname: String,
+        profileImageUrl: String?,
         location: MyLocationData
     ): Flow<DataResource<Unit>>
 

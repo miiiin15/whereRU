@@ -139,6 +139,7 @@ class LiveLocationViewModel @Inject constructor(
                     authSessionManager.targetSessionId!!,
                     authSessionManager.uid!!,
                     _myProfile.value!!.nickname,
+                    _myProfile.value!!.profileImageUrl,
                     location
                 ).collectDataResource(
                     onSuccess = {},

@@ -59,11 +59,13 @@ class FirebaseServiceImpl @Inject constructor(
         sessionId: String,
         uid: String,
         nickname: String,
+        profileImageUrl: String?,
         location: MyLocationEntity
     ): Unit {
 
         val myLocation = MyLocationRequest(
             nickname = nickname,
+            profileImageUrl = profileImageUrl,
             location = location
         )
 
@@ -260,6 +262,8 @@ class FirebaseServiceImpl @Inject constructor(
                     val userId = userSnap.key ?: continue
 
                     val nickname = userSnap.child("nickname").getValue(String::class.java) ?: ""
+                    val profileImageUrl =
+                        userSnap.child("profileImageUrl").getValue(String::class.java) ?: ""
                     val latitude =
                         userSnap.child("location/latitude").getValue(Double::class.java) ?: 0.0
                     val longitude =
@@ -270,6 +274,7 @@ class FirebaseServiceImpl @Inject constructor(
                     val user = LiveLocationUserBlock(
                         userId = userId,
                         nickname = nickname,
+                        profileImageUrl = profileImageUrl,
                         location = LiveLocationDataBlock(
                             latitude = latitude,
                             longitude = longitude,

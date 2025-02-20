@@ -9,6 +9,7 @@ interface LiveLocationRemoteDataSource {
         sessionId: String,
         userId: String,
         nickname: String,
+        profileImageUrl: String?,
         location: MyLocationEntity
     ): Unit
 

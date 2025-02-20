@@ -13,9 +13,10 @@ class LiveLocationRemoteDataSourceImpl @Inject constructor(
         sessionId: String,
         userId: String,
         nickname: String,
+        profileImageUrl: String?,
         location: MyLocationEntity
     ): Unit =
-        firebaseService.updateMyLocation(sessionId, userId, nickname, location)
+        firebaseService.updateMyLocation(sessionId, userId, nickname,profileImageUrl, location)
 
     override suspend fun deleteMyLocation(
         sessionId: String,

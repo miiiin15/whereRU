@@ -10,8 +10,9 @@ import com.miiiin15.whereru.remote.utils.RemoteMapper
 data class LiveLocationUserBlock(
     val userId: String = "",
     val nickname: String = "",
+    val profileImageUrl: String = "",
     val location: LiveLocationDataBlock = LiveLocationDataBlock()
 ) : RemoteMapper<LiveLocationUserEntity> {
     override fun toData(): LiveLocationUserEntity =
-        LiveLocationUserEntity(userId, nickname, location.toData())
+        LiveLocationUserEntity(userId, nickname, profileImageUrl, location.toData())
 }
