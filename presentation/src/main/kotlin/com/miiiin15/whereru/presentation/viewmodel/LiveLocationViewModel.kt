@@ -149,16 +149,14 @@ class LiveLocationViewModel @Inject constructor(
         }
     }
 
-    fun deleteMyLocation(callback: () -> Unit) {
+    fun deleteMyLocation() {
         setTrackingState(false)
         launch {
             deleteMyLocationUseCase(
                 authSessionManager.targetSessionId!!,
                 authSessionManager.uid!!
             ).collectDataResource(
-                onSuccess = {
-                    callback.invoke()
-                },
+                onSuccess = {},
                 loadingEnable = false
             )
         }

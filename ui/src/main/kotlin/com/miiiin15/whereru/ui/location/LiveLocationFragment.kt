@@ -34,13 +34,9 @@ class LiveLocationFragment :
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             showCustomAlert("세션을 이탈하시겠습니까?") {
-                if (viewModel.isHost.value) {
-                    requireActivity().supportFragmentManager.popBackStack()
-                } else {
-                    viewModel.deleteMyLocation {
-                        requireActivity().supportFragmentManager.popBackStack()
-                    }
-                }
+                // TODO : 호스트 이탈 처리 필요시 viewModel.isHost 이용
+                viewModel.deleteMyLocation()
+                requireActivity().supportFragmentManager.popBackStack()
             }
 
         }
