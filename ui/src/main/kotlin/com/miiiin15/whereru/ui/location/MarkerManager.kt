@@ -4,6 +4,8 @@ import android.animation.ValueAnimator
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -34,9 +36,21 @@ class MarkerManager(
                 marker?.snippet = newTime
                 newMarkers[userId] = marker!!
             } else { // 좌표가 다른 새로운 마커인 경우
-                val bitmap =
-                    BitmapFactory.decodeResource(resources, R.drawable.profile_image_default)
+
+                val bitmap = BitmapFactory.decodeResource(resources, R.drawable.profile_image_default).copy(Bitmap.Config.ARGB_8888, true)
                 val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, false)
+                val canvas = Canvas(scaledBitmap)
+
+                if (!user.profileImageUrl.isNullOrBlank()) {
+                    val paint = Paint().apply {
+                        colorFilter = android.graphics.PorterDuffColorFilter(
+                            user.profileImageUrl!!.toInt(),
+                            android.graphics.PorterDuff.Mode.SRC_IN
+                        )
+                    }
+                    canvas.drawBitmap(scaledBitmap, 0f, 0f, paint)
+                }
+
                 val marker = mMap?.addMarker(
                     MarkerOptions()
                         .position(newPosition)
