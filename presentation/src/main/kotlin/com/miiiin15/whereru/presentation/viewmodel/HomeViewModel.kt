@@ -69,6 +69,10 @@ class HomeViewModel @Inject constructor(
         // TODO : 친구 목록 가져오기
     }
 
+    fun setNavigationTarget(target: HomeNavigationTarget) {
+        _navigationTarget.value = target
+    }
+
     // 내 프로필 가져오기
     fun fetchProfile() = launch {
         authSessionManager.uid?.let { uid ->
@@ -121,7 +125,7 @@ class HomeViewModel @Inject constructor(
                 System.currentTimeMillis()
             ).collectDataResource({
                 authSessionManager.setTargetSessionId(sessionId)
-                _navigationTarget.value = HomeNavigationTarget.ToLiveLocation
+                setNavigationTarget(HomeNavigationTarget.ToLiveLocation)
             })
         }
     }
@@ -144,7 +148,7 @@ class HomeViewModel @Inject constructor(
             if (authSessionManager.isEmptyTargetSessionId()) {
                 createSession()
             }
-            _navigationTarget.value = HomeNavigationTarget.ToLiveLocation
+            setNavigationTarget(HomeNavigationTarget.ToLiveLocation)
             callback?.invoke()
         }
     }

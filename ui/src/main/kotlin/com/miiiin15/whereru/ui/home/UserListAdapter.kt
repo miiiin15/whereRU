@@ -1,7 +1,7 @@
 package com.miiiin15.whereru.ui.home
 
+import android.content.res.ColorStateList
 import android.view.View
-import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.databinding.ViewDataBinding
@@ -73,7 +73,10 @@ class UserListAdapter(
         override fun setData(data: UserUiModel) {
             userBinding.userInfo = data
             userBinding.executePendingBindings()
-            // TODO : Glide로 프로필 이미지 로딩
+            if(!data.profileImageUrl.isNullOrBlank()){
+            userBinding.userItemProfileImage.backgroundTintList =
+                ColorStateList.valueOf(data.profileImageUrl!!.toInt())
+            }
         }
 
     }

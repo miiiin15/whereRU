@@ -3,11 +3,13 @@ package com.miiiin15.whereru.ui.home
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -86,6 +88,10 @@ class HomeFragment :
         binding {
             vm = viewModel
 
+            homeTitleContainer.setOnClickListener {
+                viewModel.setNavigationTarget(HomeNavigationTarget.ToProfileEdit)
+            }
+
             homeNavigateLocationButton.setOnClickListener {
                 val sessionIdDisable = viewModel.myProfile.value?.sessionId.isNullOrBlank()
                 showCustomBottomSheet(
@@ -121,11 +127,15 @@ class HomeFragment :
         viewModel {
             myProfile observe { my ->
                 if (my.nickname != null) {
+                    binding.homeTitleContainer.visibility = View.VISIBLE
                     binding.homeTitleText.apply {
                         text = my.nickname
-                        visibility = View.VISIBLE
                         binding.homeTitleShimmer.visibility = View.GONE
                     }
+                }
+                if (!my.profileImageUrl.isNullOrBlank()) {
+                    binding.homeProfileImage.backgroundTintList =
+                        ColorStateList.valueOf(my.profileImageUrl!!.toInt())
                 }
             }
 
@@ -138,7 +148,12 @@ class HomeFragment :
                     }
 
                     HomeNavigationTarget.ToSetting -> {}
-                    HomeNavigationTarget.ToProfileEdit -> {}
+                    HomeNavigationTarget.ToProfileEdit -> {
+                        val action = HomeFragmentDirections.actionHomeToProfile()
+                        findNavController().navigate(action)
+                        viewModel.clearTrigger()
+                    }
+
                     null -> {}
                 }
             }
