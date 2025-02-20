@@ -26,25 +26,33 @@
             android:layout_height="match_parent" />
 
         <LinearLayout
+            android:id="@+id/live_location_chase_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:gravity="center"
+            android:layout_marginTop="@dimen/padding_horizontal"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/border_background"
+            android:backgroundTint="#90FFFFFF"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="@dimen/padding_horizontal">
+            android:paddingHorizontal="4dp">
 
             <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/profile_image_default" />
+                android:id="@+id/live_location_chase_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="?attr/selectableItemBackground"
+                android:elevation="1dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/icon_chase_off" />
 
             <TextView
-                android:id="@+id/live_location_marker_count_text"
-                style="@style/Subtitle"
+                android:id="@+id/live_location_chase_nickname"
+                style="@style/Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="@color/black" />
+                android:layout_marginRight="4dp"
+                android:text="없음" />
         </LinearLayout>
 
         <LinearLayout
@@ -55,12 +63,38 @@
             android:orientation="vertical"
             android:paddingHorizontal="8dp">
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_marginBottom="@dimen/spacing_input_field"
+                android:background="@drawable/border_background"
+                android:backgroundTint="#90FFFFFF"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/profile_image_default" />
+
+                <TextView
+                    android:id="@+id/live_location_marker_count_text"
+                    style="@style/Subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
             <Switch
                 android:id="@+id/live_location_transmit_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/spacing_input_field"
-                android:background="#90FFFFFF"
+                android:background="@drawable/border_background"
+                android:backgroundTint="#90FFFFFF"
                 android:checked="@{vm.isWantTransmit}"
                 android:padding="10dp"
                 android:text="공유 하기"
@@ -71,7 +105,8 @@
                 android:id="@+id/live_location_receive_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#90FFFFFF"
+                android:background="@drawable/border_background"
+                android:backgroundTint="#90FFFFFF"
                 android:checked="@{vm.isWantReceive()}"
                 android:padding="10dp"
                 android:text="공유 받기"
