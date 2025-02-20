@@ -84,7 +84,7 @@ class AuthViewModel @Inject constructor(
     private suspend fun setInitialProfile(uid: String) {
         setProfileUseCase(
             userId = uid,
-            nickname = "유저_${uid.substring(0, 8)}",
+            nickname = "유저_${uid.substring(0, 6)}",
             lastLoginAt = System.currentTimeMillis(),
             fcmToken = _fcmToken.value
         ).await()
