@@ -1,11 +1,11 @@
 package com.miiiin15.whereru.ui.location
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -28,6 +28,8 @@ class LiveLocationFragment :
     private var mMap: GoogleMap? = null
     private lateinit var markerManager: MarkerManager
     private var isCameraMoved = false
+    private var targetUerId: String? = null
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,29 +65,46 @@ class LiveLocationFragment :
             isRotateGesturesEnabled = false
         }
 
-        // 초기 카메라 위치 설정
-        mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(37.556, 126.97), 10f))
 
         // ViewModel 관찰자 설정
         setupViewModelObservers()
+
+        // Map 관련 설정
+        setupMapView()
     }
 
     private fun setupViewModelObservers() {
         viewModel {
             users observe { users ->
                 markerManager.updateMarkers(users)
+                binding.liveLocationMarkerCountText.text = "${users.size}"
 
+                // 인 엔 아웃 처리
                 if (markerManager.removedUserNickname != null) {
-                    Toast.makeText(
-                        requireContext(),
-                        "${markerManager.removedUserNickname}님이 세션을 나가셨습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showToast("${markerManager.removedUserNickname}님이 세션을 나가셨습니다.")
                     markerManager.removedUserNickname = null
                 }
+                if (!markerManager.newUserNickname.isNullOrBlank()) {
+                    showToast("${markerManager.newUserNickname}님이 세션에 들어오셨습니다.")
+                    markerManager.newUserNickname = null
+                }
 
+                // 타켓 카메라 추적
+                if (markerManager.getMarkerPosition(targetUerId) != null) {
+                    mMap!!.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            markerManager.getMarkerPosition(targetUerId)!!,
+                            18f
+                        )
+                    )
+                } else {
+                    binding.liveLocationChaseIcon.setImageDrawable(
+                        ContextCompat.getDrawable(requireContext(), R.drawable.icon_chase_off)
+                    )
+                    binding.liveLocationChaseNickname.text = "없음"
+                    targetUerId = ""
+                }
 
-                binding.liveLocationMarkerCountText.text = "${users.size}"
             }
             myLocation observe {
                 if (!isCameraMoved && myLocation.value != null) {
@@ -97,16 +116,6 @@ class LiveLocationFragment :
                     )
                     isCameraMoved = true
                 }
-            }
-
-            isWantReceive observe { isChecked ->
-                val color = if (isChecked) "#90FFFFFF" else "#80AAAAAA"
-                binding.liveLocationReceiveSwitch.setBackgroundColor(Color.parseColor(color))
-            }
-
-            isWantTransmit observe { isChecked ->
-                val color = if (isChecked) "#90FFFFFF" else "#80AAAAAA"
-                binding.liveLocationTransmitSwitch.setBackgroundColor(Color.parseColor(color))
             }
         }
 
@@ -121,6 +130,34 @@ class LiveLocationFragment :
                 viewModel.setObserveSessionState(isChecked)
             }
         }
+    }
+
+    private fun setupMapView() {
+        mMap!!.apply {
+            moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(37.556, 126.97), 10f))
+
+            setOnMarkerClickListener { marker ->
+                marker.showInfoWindow()
+                binding.liveLocationChaseIcon.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.icon_chase_on)
+                )
+                binding.liveLocationChaseNickname.text = marker.title
+                targetUerId = marker.tag as String
+                true
+            }
+
+            setOnMapClickListener {
+                binding.liveLocationChaseIcon.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.icon_chase_off)
+                )
+                binding.liveLocationChaseNickname.text = "없음"
+                targetUerId = null
+            }
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {

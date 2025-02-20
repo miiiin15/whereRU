@@ -20,6 +20,12 @@ class MarkerManager(
 ) {
     private val markers = mutableMapOf<String, Marker>()
     var removedUserNickname: String? = null
+    var newUserNickname: String? = null
+
+    fun getMarkerPosition(userId: String?): LatLng? {
+        if (userId == null) return null
+        return markers[userId]?.position
+    }
 
 
     fun updateMarkers(users: Map<String, LiveLocationUserUiModel>) {
@@ -37,7 +43,11 @@ class MarkerManager(
                 newMarkers[userId] = marker!!
             } else { // 좌표가 다른 새로운 마커인 경우
 
-                val bitmap = BitmapFactory.decodeResource(resources, R.drawable.profile_image_default).copy(Bitmap.Config.ARGB_8888, true)
+                newUserNickname = user.nickname
+
+                val bitmap =
+                    BitmapFactory.decodeResource(resources, R.drawable.profile_image_default)
+                        .copy(Bitmap.Config.ARGB_8888, true)
                 val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, false)
                 val canvas = Canvas(scaledBitmap)
 
@@ -58,7 +68,9 @@ class MarkerManager(
                         .snippet(newTime)
                         .icon(BitmapDescriptorFactory.fromBitmap(scaledBitmap))
                 )
+
                 if (marker != null) {
+                    marker.tag = user.userId
                     newMarkers[userId] = marker
                 }
             }
