@@ -111,6 +111,7 @@ class LiveLocationViewModel @Inject constructor(
 
         if (isTracking) {
             locationTracker.startTracking { location ->
+                if (_sessionInfo.value?.hostId.isNullOrBlank()) return@startTracking
                 updateMyLocation(
                     MyLocationData(
                         location.latitude,
