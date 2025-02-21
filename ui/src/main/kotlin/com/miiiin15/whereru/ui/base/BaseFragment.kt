@@ -15,7 +15,7 @@ import com.miiiin15.whereru.presentation.extension.observe
 import com.miiiin15.whereru.ui.extension.repeatOnStarted
 import kotlinx.coroutines.flow.StateFlow
 import com.miiiin15.whereru.ui.BR
-import com.miiiin15.whereru.ui.component.CustomBottomSheetDialog
+import com.miiiin15.whereru.ui.custom.CustomBottomSheetDialog
 import com.miiiin15.whereru.ui.custom.LoadingDialog
 
 abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : ViewEvent>(

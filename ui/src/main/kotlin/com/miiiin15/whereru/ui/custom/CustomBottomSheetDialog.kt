@@ -1,4 +1,4 @@
-package com.miiiin15.whereru.ui.component
+package com.miiiin15.whereru.ui.custom
 
 import android.os.Bundle
 import android.view.LayoutInflater

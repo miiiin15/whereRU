@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,7 +24,7 @@ import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
 import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
-import com.miiiin15.whereru.ui.component.SimpleMotionLayoutListener
+import com.miiiin15.whereru.ui.custom.SimpleMotionLayoutListener
 import com.miiiin15.whereru.ui.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
