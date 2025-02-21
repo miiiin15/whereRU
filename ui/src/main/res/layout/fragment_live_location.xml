@@ -29,8 +29,8 @@
             android:id="@+id/live_location_chase_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_horizontal"
             android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="@dimen/padding_horizontal"
             android:background="@drawable/border_background"
             android:backgroundTint="#90FFFFFF"
             android:gravity="center_vertical"
@@ -64,15 +64,20 @@
             android:paddingHorizontal="8dp">
 
             <LinearLayout
+                android:id="@+id/live_location_marker_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
                 android:layout_marginBottom="@dimen/spacing_input_field"
                 android:background="@drawable/border_background"
                 android:backgroundTint="#90FFFFFF"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="10dp">
+                android:padding="10dp"
+                tools:ignore="UnusedAttribute">
 
                 <ImageView
                     android:layout_width="25dp"

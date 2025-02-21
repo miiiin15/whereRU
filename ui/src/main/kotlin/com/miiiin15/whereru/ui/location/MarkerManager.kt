@@ -26,6 +26,14 @@ class MarkerManager(
 
     private var _removedUser: LiveLocationUserUiModel? = null
     private var _newUser: LiveLocationUserUiModel? = null
+    private var currentIndex = 0
+
+    fun getNextMarker(): Marker? {
+        if (markers.isEmpty()) return null
+        val marker = markers.values.elementAt(currentIndex)
+        currentIndex = (currentIndex + 1) % markers.size // markers.size 에 도달하면 0으로 초기화
+        return marker
+    }
 
     fun getMarkerPosition(userId: String?): LatLng? {
         if (userId == null) return null

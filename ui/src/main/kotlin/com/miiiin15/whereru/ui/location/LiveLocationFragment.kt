@@ -10,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.miiiin15.whereru.presentation.viewmodel.LiveLocationViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
@@ -54,6 +55,15 @@ class LiveLocationFragment :
             liveLocationReceiveSwitch.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setObserveSessionState(isChecked)
             }
+
+            liveLocationMarkerContainer.setOnClickListener {
+                if (markerManager.getNextMarker() != null) {
+                    mapManager?.moveCamera(
+                        markerManager.getNextMarker()!!.position
+                    )
+                    targetOn(markerManager.getNextMarker()!!)
+                }
+            }
         }
 
     }
@@ -63,20 +73,8 @@ class LiveLocationFragment :
         // 지도 초기화
         mapManager = MapManager(googleMap).apply {
             initializeMap(
-                onMarkerClick = { marker ->
-                    binding.liveLocationChaseIcon.setImageDrawable(
-                        ContextCompat.getDrawable(requireContext(), R.drawable.icon_chase_on)
-                    )
-                    binding.liveLocationChaseNickname.text = marker.title
-                    targetUerId = marker.tag as String
-                },
-                onMapClick = {
-                    binding.liveLocationChaseIcon.setImageDrawable(
-                        ContextCompat.getDrawable(requireContext(), R.drawable.icon_chase_off)
-                    )
-                    binding.liveLocationChaseNickname.text = "없음"
-                    targetUerId = null
-                }
+                onMarkerClick = { targetOn(it) },
+                onMapClick = { targetOff() },
             )
         }
 
@@ -108,6 +106,23 @@ class LiveLocationFragment :
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
+    private fun targetOn(marker: Marker) {
+        binding.liveLocationChaseIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.icon_chase_on)
+        )
+        binding.liveLocationChaseNickname.text = marker.title
+        targetUerId = marker.tag as String
+    }
+
+    private fun targetOff() {
+        binding.liveLocationChaseIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.icon_chase_off)
+        )
+        binding.liveLocationChaseNickname.text = "없음"
+        targetUerId = null
+    }
+
+
     override fun handleEvent(event: LiveLocationViewModel.Event) {
         when (event) {
             // 내 위치 업데이트
@@ -117,8 +132,7 @@ class LiveLocationFragment :
                         LatLng(
                             event.location.latitude,
                             event.location.longitude
-                        )
-                        , 17f
+                        ), 17f
                     )
                     isCameraMoved = true
                 }
