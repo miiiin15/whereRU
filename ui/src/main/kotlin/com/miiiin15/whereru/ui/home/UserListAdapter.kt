@@ -73,6 +73,9 @@ class UserListAdapter(
         override fun setData(data: UserUiModel) {
             userBinding.userInfo = data
             userBinding.executePendingBindings()
+           userBinding.userItemStatusImage.visibility =
+               if (data.sessionId.isNullOrBlank()) View.GONE else View.VISIBLE
+
             if(!data.profileImageUrl.isNullOrBlank()){
             userBinding.userItemProfileImage.backgroundTintList =
                 ColorStateList.valueOf(data.profileImageUrl!!.toInt())
