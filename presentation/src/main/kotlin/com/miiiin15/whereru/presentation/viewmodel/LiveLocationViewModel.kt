@@ -5,10 +5,10 @@ import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.model.MyLocationData
 import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.livelocation.DeleteMyLocationUseCase
+import com.miiiin15.whereru.domain.usecase.livelocation.UpdateMyLocationUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetProfileUseCase
 import com.miiiin15.whereru.domain.usecase.session.ObserveSessionUseCase
 import com.miiiin15.whereru.domain.usecase.session.StopObserveSessionUseCase
-import com.miiiin15.whereru.domain.usecase.livelocation.UpdateMyLocationUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
 import com.miiiin15.whereru.presentation.model.LiveLocationUserUiModel
@@ -35,20 +35,14 @@ class LiveLocationViewModel @Inject constructor(
     private val _myProfile = MutableStateFlow<UserUiModel?>(null)
     val myProfile = _myProfile.asStateFlow()
 
-    private val _myLocation = MutableStateFlow<LocationUiModel?>(null)
-    val myLocation = _myLocation.asStateFlow()
+    private val _sessionInfo = MutableStateFlow<LocationSessionUiModel?>(null)
+    val sessionInfo = _sessionInfo.asStateFlow()
 
     private val _isWantTransmit = MutableStateFlow(true)
     val isWantTransmit = _isWantTransmit.asStateFlow()
 
     private val _isWantReceive = MutableStateFlow(true)
     val isWantReceive = _isWantReceive.asStateFlow()
-
-    private val _sessionInfo = MutableStateFlow<LocationSessionUiModel?>(null)
-    val sessionInfo = _sessionInfo.asStateFlow()
-
-    private val _users = MutableStateFlow<Map<String, LiveLocationUserUiModel>>(emptyMap())
-    val users = _users.asStateFlow()
 
     private val _isHost = MutableStateFlow(false)
     val isHost = _isHost.asStateFlow()
@@ -85,12 +79,11 @@ class LiveLocationViewModel @Inject constructor(
                         val newUsers = session.users
                             .filterKeys { it != authSessionManager.uid }
                             .mapValues { entry -> entry.value.toPresentation() }
-                        _users.value = newUsers
                         event(Event.UsersUpdated(newUsers))
                     },
                     onError = {
-                        showAlert("${it.message}")
                         if (_sessionInfo.value?.hostId.isNullOrBlank()) {
+                            showAlert("${it.message}")
                             setObserveSessionState(false)
                             setTrackingState(false)
                             return@observeSessionUseCase
@@ -134,7 +127,7 @@ class LiveLocationViewModel @Inject constructor(
             return
         }
         launch {
-            _myProfile.value?.nickname.let {
+            if (!_myProfile.value?.nickname.isNullOrBlank()) {
                 updateMyLocationUseCase(
                     authSessionManager.targetSessionId!!,
                     authSessionManager.uid!!,
@@ -164,9 +157,8 @@ class LiveLocationViewModel @Inject constructor(
 
     fun currentMyLocation() {
         launch {
-            val loc = locationTracker.getCurrentLocation()
-            loc?.let { location ->
-                _myLocation.value = location.toPresentation()
+            locationTracker.getCurrentLocation()?.let { location ->
+                event(Event.MyLocationUpdated(location.toPresentation()))
             } ?: return@launch
         }
     }
@@ -178,6 +170,7 @@ class LiveLocationViewModel @Inject constructor(
     }
 
     sealed class Event : ViewEvent {
+        data class MyLocationUpdated(val location: LocationUiModel) : Event()
         data class UsersUpdated(val users: Map<String, LiveLocationUserUiModel>) : Event()
     }
 }
