@@ -42,9 +42,6 @@ class HomeViewModel @Inject constructor(
     private val authSessionManager: AuthSessionManager,
 ) : BaseViewModel<HomeViewModel.Event>() {
 
-    private val _navigationTarget = MutableStateFlow<HomeNavigationTarget?>(null)
-    val navigationTarget = _navigationTarget.asStateFlow()
-
     private val _myProfile = MutableStateFlow<UserUiModel?>(null)
     val myProfile = _myProfile.asStateFlow()
 
@@ -67,10 +64,6 @@ class HomeViewModel @Inject constructor(
         getAllProfile()
         getRecentSessionList()
         // TODO : 친구 목록 가져오기
-    }
-
-    fun setNavigationTarget(target: HomeNavigationTarget) {
-        _navigationTarget.value = target
     }
 
     // 내 프로필 가져오기
@@ -125,7 +118,7 @@ class HomeViewModel @Inject constructor(
                 System.currentTimeMillis()
             ).collectDataResource({
                 authSessionManager.setTargetSessionId(sessionId)
-                setNavigationTarget(HomeNavigationTarget.ToLiveLocation)
+                event(Event.Navigate(HomeNavigationTarget.ToLiveLocation))
             })
         }
     }
@@ -148,7 +141,7 @@ class HomeViewModel @Inject constructor(
             if (authSessionManager.isEmptyTargetSessionId()) {
                 createSession()
             }
-            setNavigationTarget(HomeNavigationTarget.ToLiveLocation)
+            event(Event.Navigate(HomeNavigationTarget.ToLiveLocation))
             callback?.invoke()
         }
     }
@@ -233,9 +226,10 @@ class HomeViewModel @Inject constructor(
 
     // 트리거 정리
     fun clearTrigger() {
-        _navigationTarget.value = null
         fetched.value = false
     }
 
-    sealed class Event : ViewEvent
+    sealed class Event : ViewEvent {
+        data class Navigate(val target: HomeNavigationTarget) : Event()
+    }
 }
