@@ -1,8 +1,6 @@
 package com.miiiin15.whereru.ui.home
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
-import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
@@ -16,12 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.miiiin15.whereru.presentation.fcm.FCMMessageHolder
 import com.miiiin15.whereru.presentation.model.JoinedSessionUiModel
-import com.miiiin15.whereru.presentation.model.PushMessageUiModel
-import com.miiiin15.whereru.presentation.model.PushUiType
-import com.miiiin15.whereru.presentation.model.ResponseUiType
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.navigation.HomeNavigationTarget
 import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel
+import com.miiiin15.whereru.presentation.viewmodel.HomeViewModel.Event.*
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
 import com.miiiin15.whereru.ui.custom.SimpleMotionLayoutListener
@@ -88,7 +84,7 @@ class HomeFragment :
             vm = viewModel
 
             homeTitleContainer.setOnClickListener {
-                viewModel.setNavigationTarget(HomeNavigationTarget.ToProfileEdit)
+                viewModel.event(Navigate(HomeNavigationTarget.ToProfileEdit))
             }
 
             homeNavigateLocationButton.setOnClickListener {
@@ -137,34 +133,43 @@ class HomeFragment :
                         ColorStateList.valueOf(my.profileImageUrl!!.toInt())
                 }
             }
-
-            navigationTarget observe { target ->
-                when (target) {
-                    HomeNavigationTarget.ToLiveLocation -> {
-                        val action = HomeFragmentDirections.actionHomeToLiveLocation()
-                        findNavController().navigate(action)
-                        viewModel.clearTrigger()
-                    }
-
-                    HomeNavigationTarget.ToSetting -> {}
-                    HomeNavigationTarget.ToProfileEdit -> {
-                        val action = HomeFragmentDirections.actionHomeToProfile()
-                        findNavController().navigate(action)
-                        viewModel.clearTrigger()
-                    }
-
-                    null -> {}
-                }
-            }
         }
 
         setViewPager()
     }
 
+
     override fun onResume() {
         super.onResume()
         FCMMessageHolder.consume()?.let { message ->
-            fcmAction(message)
+            FcmActionHandler.handleFcmAction(
+                context = requireContext(),
+                message = message,
+                showCustomBottomSheet = { title, leftButtonText, rightButtonText, onLeftButtonClick, onRightButtonClick ->
+                    showCustomBottomSheet(
+                        title,
+                        leftButtonText,
+                        rightButtonText,
+                        onLeftButtonClick,
+                        onRightButtonClick
+                    )
+                },
+                showCustomAlert = { msg, onConfirm ->
+                    showCustomAlert(msg, onConfirm)
+                },
+                sendResponsePushMessage = { msg, accepted ->
+                    if (accepted) {
+                        viewModel.checkSessionID {
+                            viewModel.sendResponsePushMessage(msg, accepted)
+                        }
+                    } else {
+                        viewModel.sendResponsePushMessage(msg, accepted)
+                    }
+                },
+                participationSession = { sessionId, nickname ->
+                    viewModel.participationSession(sessionId, nickname)
+                }
+            )
         }
     }
 
@@ -231,14 +236,13 @@ class HomeFragment :
         }
     }
 
+
     private fun showDeleteSessionAlert() {
-        if (viewModel.myProfile.value?.sessionId.isNullOrBlank()) {
-            showCustomAlert("공유중인 세션이 없습니다.")
-            return
-        }
-        showCustomAlert("세션을 삭제 하시겠습니까?") {
-            viewModel.deleteSession()
-        }
+        viewModel.myProfile.value?.sessionId?.let {
+            showCustomAlert("세션을 삭제 하시겠습니까?") {
+                viewModel.deleteSession()
+            }
+        } ?: showCustomAlert("공유중인 세션이 없습니다.")
     }
 
     private fun recentSessionClickAction(session: JoinedSessionUiModel) {
@@ -283,61 +287,27 @@ class HomeFragment :
         )
     }
 
-    private fun fcmAction(message: PushMessageUiModel) {
-
-        // 포그라운드에서 수신한 PushMessage 삭제
-        val notificationManager =
-            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(message.notificationId)
-
-        when (message.type) {
-            // 위치 공유 요청
-            PushUiType.REQUEST_LOCATION -> {
-                showCustomBottomSheet(
-                    "${message.fromNickname}님이 ${message.timestamp} 위치 공유 요청을 보냈습니다.\n수락하시겠습니까?",
-                    "거절",
-                    "수락",
-                    onLeftButtonClick = {
-                        viewModel.sendResponsePushMessage(message, false)
-                    },
-                    onRightButtonClick = {
-                        viewModel.checkSessionID {
-                            viewModel.sendResponsePushMessage(message, true)
-                        }
-
+    override fun handleEvent(event: HomeViewModel.Event) {
+        when (event) {
+            is Navigate -> {
+                when (event.target) {
+                    HomeNavigationTarget.ToLiveLocation -> {
+                        val action = HomeFragmentDirections.actionHomeToLiveLocation()
+                        findNavController().navigate(action)
+                        viewModel.clearTrigger()
                     }
-                )
-            }
 
-            // 위치 공유 응답
-            PushUiType.RESPONSE_LOCATION -> {
-                message.response?.let {
-                    when (it) {
-                        ResponseUiType.ACCEPT -> {
-                            showCustomAlert("${message.fromNickname}님이 위치 공유를 수락했습니다.\n 참여 하시겠습니까?") {
-                                viewModel.participationSession(
-                                    message.sessionId,
-                                    message.fromNickname
-                                )
-                            }
-                        }
-
-                        ResponseUiType.DECLINE -> {
-                            showCustomAlert("${message.fromNickname}님이 위치 공유를 거절했습니다.")
-                        }
+                    HomeNavigationTarget.ToSetting -> {}
+                    HomeNavigationTarget.ToProfileEdit -> {
+                        val action = HomeFragmentDirections.actionHomeToProfile()
+                        findNavController().navigate(action)
+                        viewModel.clearTrigger()
                     }
-                } ?: run {
-                    showCustomAlert("응답을 받을 수 없습니다.")
+
+                    null -> {}
                 }
             }
-
-            // 세션 종료
-            PushUiType.CANCEL_SESSION -> {}
         }
-
-    }
-
-    override fun handleEvent(event: HomeViewModel.Event) {
     }
 
     enum class Category {
