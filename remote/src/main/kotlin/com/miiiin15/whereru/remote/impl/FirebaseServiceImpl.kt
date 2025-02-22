@@ -1,14 +1,11 @@
 package com.miiiin15.whereru.remote.impl
 
-import android.provider.Settings.Global.getString
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
 import com.miiiin15.whereru.data.model.JoinedSessionEntity
 import com.miiiin15.whereru.data.model.ProfileEntity
@@ -21,6 +18,12 @@ import com.miiiin15.whereru.remote.model.MyLocationRequest
 import com.miiiin15.whereru.remote.model.ParticipationSessionRequest
 import com.miiiin15.whereru.remote.service.FirebaseService
 import com.miiiin15.whereru.remote.utils.FirebasePaths
+import com.miiiin15.whereru.remote.utils.deleteDocument
+import com.miiiin15.whereru.remote.utils.getCollection
+import com.miiiin15.whereru.remote.utils.getDocument
+import com.miiiin15.whereru.remote.utils.getPaginatedDocuments
+import com.miiiin15.whereru.remote.utils.setDocument
+import com.miiiin15.whereru.remote.utils.updateDocument
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -117,15 +120,9 @@ class FirebaseServiceImpl @Inject constructor(
      * 최근 참여한 모든 세션 조회
      * **/
     override suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity> {
-        return runCatching {
-            firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
-                .get()
-                .await()
-                .documents.map { document ->
-                    document.toObject(JoinedSessionEntity::class.java)
-                        ?.copy(sessionId = document.id)
-                }.filterNotNull()
-        }.getOrElse { throw Exception("세션 조회 실패: ${it.message}") }
+        return firebaseFirestore.getCollection<JoinedSessionEntity>(
+            "${FirebasePaths.JOINED_SESSIONS}/$userId/sessions", "세션 조회 실패"
+        )
     }
 
     /**
@@ -136,24 +133,13 @@ class FirebaseServiceImpl @Inject constructor(
         lastVisible: Long?,
         pageSize: Int
     ): List<JoinedSessionEntity> {
-        return runCatching {
-            val query = firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
-                .orderBy("participationTime", Query.Direction.DESCENDING) // 정렬 기준 필드
-
-            // lastVisible이 null이 아닐 경우에만 startAfter 추가
-            val paginatedQuery = lastVisible?.let {
-                query.startAfter(it)
-            } ?: query
-
-            paginatedQuery
-                .limit(pageSize.toLong())
-                .get()
-                .await()
-                .documents.map { document ->
-                    document.toObject(JoinedSessionEntity::class.java)
-                        ?.copy(sessionId = document.id)
-                }.filterNotNull()
-        }.getOrElse { throw Exception("세션 범위 조회 실패: ${it.message}") }
+        return firebaseFirestore.getPaginatedDocuments<JoinedSessionEntity>(
+            collectionPath = "${FirebasePaths.JOINED_SESSIONS}/$userId/sessions",
+            orderByField = "participationTime",
+            lastVisible = lastVisible,
+            pageSize = pageSize,
+            errorLabel = "세션 범위 조회 실패"
+        )
     }
 
     /**
@@ -165,30 +151,25 @@ class FirebaseServiceImpl @Inject constructor(
         hostNickname: String,
         participationTime: Long
     ): Unit {
-        runCatching {
-            val participationRequest = ParticipationSessionRequest(hostNickname, participationTime)
+        val participationRequest = ParticipationSessionRequest(hostNickname, participationTime)
 
-            firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
-                .document(targetSessionId)
-                .set(participationRequest)
-                .await()
-        }.getOrElse {
-            throw Exception("세션 기록 실패: ${it.message}")
-        }
+        firebaseFirestore.setDocument(
+            "${FirebasePaths.JOINED_SESSIONS}/$userId/sessions",
+            targetSessionId,
+            participationRequest,
+            "세션 기록 실패"
+        )
     }
 
     /**
      * 세션 이탈
      * **/
     override suspend fun exitSession(userId: String, targetSessionId: String): Unit {
-        runCatching {
-            firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
-                .document(targetSessionId)
-                .delete()
-                .await()
-        }.getOrElse {
-            throw Exception("세션 이탈 실패: ${it.message}")
-        }
+        firebaseFirestore.deleteDocument(
+            "${FirebasePaths.JOINED_SESSIONS}/$userId/sessions",
+            targetSessionId,
+            "세션 이탈 실패"
+        )
     }
 
 
@@ -196,94 +177,78 @@ class FirebaseServiceImpl @Inject constructor(
      * 모든 프로필 조회
      * **/
     override suspend fun getAllProfiles(): List<ProfileEntity> {
-        return runCatching {
-            firebaseFirestore.collection(FirebasePaths.TEST_USER_PROFILE)
-                .get()
-                .await()
-                .toObjects(ProfileEntity::class.java)
-        }.getOrElse { throw Exception("프로필 조회 실패: ${it.message}") }
+        return firebaseFirestore.getCollection<ProfileEntity>(
+            FirebasePaths.USER_PROFILE,
+            "프로필 조회 실패"
+        )
     }
 
     /**
      * 모든 프로필 범위 조회
      * **/
-override suspend fun getPaginatedProfiles(lastVisible: Long?, pageSize: Int): List<ProfileEntity> {
-    return runCatching {
-        val query = firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
-            .orderBy("lastLoginAt", Query.Direction.DESCENDING) // 정렬 기준 필드
-
-        // lastVisible이 null이 아닐 경우에만 startAfter 추가
-        val paginatedQuery = lastVisible?.let {
-            query.startAfter(it)
-        } ?: query
-
-        paginatedQuery
-            .limit(pageSize.toLong())
-            .get()
-            .await()
-            .toObjects(ProfileEntity::class.java)
-    }.getOrElse { throw Exception("프로필 범위 조회 실패: ${it.message}") }
-}
+    override suspend fun getPaginatedProfiles(
+        lastVisible: Long?,
+        pageSize: Int
+    ): List<ProfileEntity> {
+        return firebaseFirestore.getPaginatedDocuments<ProfileEntity>(
+            collectionPath = FirebasePaths.USER_PROFILE,
+            orderByField = "lastLoginAt",
+            lastVisible = lastVisible,
+            pageSize = pageSize,
+            errorLabel = "프로필 목록 조회 실패"
+        )
+    }
 
     /**
      * 단일 프로필 조회
      * **/
     override suspend fun getProfile(userId: String): ProfileEntity {
-        return runCatching {
-            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
-                .document(userId)
-                .get()
-                .await()
-                .toObject(ProfileEntity::class.java)!!
-        }.getOrElse { throw Exception("프로필 조회 실패: ${it.message} ") }
+        return firebaseFirestore.getDocument<ProfileEntity>(
+            FirebasePaths.USER_PROFILE,
+            userId,
+            "프로필 조회 실패"
+        )!!
     }
 
     /**
      * 프로필 저장
      * **/
     override suspend fun setProfile(profile: ProfileEntity): Unit {
-        firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
-            .document(profile.userId)
-            .set(profile)
-            .await()
+        firebaseFirestore.setDocument(
+            FirebasePaths.USER_PROFILE, profile.userId, profile, "프로필 저장 실패"
+        )
     }
 
     /**
      * 프로필 세션 ID 업데이트
      * **/
     override suspend fun updateProfileSessionId(userId: String, sessionId: String) {
-        runCatching {
-            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
-                .document(userId)
-                .update("sessionId", sessionId)
-                .await()
-        }.getOrElse { throw Exception("세션 ID 갱신 실패 : ${it.message}") }
+        firebaseFirestore.updateDocument(
+            FirebasePaths.USER_PROFILE,
+            userId,
+            hashMapOf("sessionId" to sessionId),
+            "프로필 세션 ID 갱신 실패"
+        )
     }
 
     /**
      * 마지막 로그인 시간 업데이트
      * **/
     override suspend fun updateLastLogin(userId: String, lastLoginAt: Long) {
-        runCatching {
-            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
-                .document(userId)
-                .update("lastLoginAt", lastLoginAt)
-                .await()
-        }.getOrElse {
-            throw Exception("마지막 로그인 시간 갱신 실패 : ${it.message}")
-        }
+        firebaseFirestore.updateDocument(
+            FirebasePaths.USER_PROFILE, userId, hashMapOf("lastLoginAt" to lastLoginAt),
+            "마지막 로그인 시간 갱신 실패"
+        )
     }
 
     /**
      * FCM 토큰 업데이트
      * **/
     override suspend fun updateFcmToken(userId: String, fcmToken: String) {
-        runCatching {
-            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
-                .document(userId)
-                .update("fcmToken", fcmToken)
-                .await()
-        }.getOrElse { throw Exception("FCM 토큰 갱신 실패 : ${it.message}") }
+        firebaseFirestore.updateDocument(
+            FirebasePaths.USER_PROFILE, userId, hashMapOf("fcmToken" to fcmToken),
+            "FCM 토큰 갱신 실패"
+        )
     }
 
     /**
