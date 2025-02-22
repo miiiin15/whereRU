@@ -3,14 +3,14 @@ package com.miiiin15.whereru.remote.utils
 import com.google.firebase.firestore.FirebaseFirestoreException
 
 object FirebaseExceptionHandler {
-    fun handle(e: Exception): String {
-        return when (e) {
+    fun handle(e: Exception,errorLabel: String): String {
+        val message = when (e) {
             is FirebaseFirestoreException -> {
                 when (e.code) {
                     FirebaseFirestoreException.Code.NOT_FOUND -> "데이터를 찾을 수 없습니다."
                     FirebaseFirestoreException.Code.PERMISSION_DENIED -> "권한이 없습니다."
                     FirebaseFirestoreException.Code.UNAVAILABLE -> "서버에 접근할 수 없습니다."
-                    else -> "Firestore 오류: ${e.message}"
+                    else -> "Firestore 오류 : ${e.message}"
                 }
             }
 
@@ -18,5 +18,6 @@ object FirebaseExceptionHandler {
             is IllegalArgumentException -> "요청이 잘못되었습니다. ${e.message}"
             else -> "${e.message}"
         }
+        return "$errorLabel: $message"
     }
 }
