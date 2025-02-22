@@ -11,7 +11,8 @@ import com.miiiin15.whereru.ui.base.adapter.BaseViewHolder
 import com.miiiin15.whereru.ui.databinding.ItemSessionListBinding
 
 class SessionListAdapter(
-    private val onSessionItemClickListener: OnSessionItemClickListener
+    private val onSessionItemClickListener: OnSessionItemClickListener,
+    private val onLoadMoreListener: OnLoadMoreListener
 ) :
     BaseAdapter<JoinedSessionUiModel, SessionListAdapter.BaseSessionListAdapter<out ViewDataBinding>>() {
 
@@ -20,13 +21,17 @@ class SessionListAdapter(
         viewType: Int
     ): SessionListAdapter.BaseSessionListAdapter<out ViewDataBinding> =
         LinearSessionListViewHolder(parent)
-
     private var emptyView: LinearLayout? = null
+
 
     override fun resetAll(items: List<JoinedSessionUiModel>) {
         val diffCallback = SessionDiffCallback(this.items, items)
         resetAll(items, diffCallback)
         checkEmptyView()
+    }
+
+    override fun onLoadMore() {
+        onLoadMoreListener.onLoadMore()
     }
 
     fun setEmptyView(view: LinearLayout) {
@@ -36,10 +41,11 @@ class SessionListAdapter(
 
     private fun checkEmptyView() {
         if (emptyView != null) {
-            if (items.isNullOrEmpty()) {
+            val isEmpty = items.isNullOrEmpty()
+            if (isEmpty && recyclerView.visibility != View.GONE) {
                 recyclerView.visibility = View.GONE
                 emptyView!!.visibility = View.VISIBLE
-            } else {
+            } else if (!isEmpty && recyclerView.visibility != View.VISIBLE) {
                 recyclerView.visibility = View.VISIBLE
                 emptyView!!.visibility = View.GONE
             }

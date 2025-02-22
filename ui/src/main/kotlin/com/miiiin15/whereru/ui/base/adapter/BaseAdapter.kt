@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 abstract class BaseAdapter<D, VH : BaseViewHolder<out ViewDataBinding, out D>> :
@@ -12,11 +13,59 @@ abstract class BaseAdapter<D, VH : BaseViewHolder<out ViewDataBinding, out D>> :
     private var _items: MutableList<D> = mutableListOf()
     val items: List<D> get() = _items
     lateinit var recyclerView: RecyclerView
+    private var isLoading = false // 중복 호출 방지 플래그
 
     // 리사이클러 뷰에 어댑터가 연결될 때 호출
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         this.recyclerView = recyclerView
+
+        // 공통 스크롤 리스너 추가
+        this.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (dy > 0) { // 스크롤 방향이 아래로 내려가는 경우만 처리
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                    if (!isLoading && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                        && firstVisibleItemPosition >= 0
+                    ) {
+                        isLoading = true // 로딩 시작
+                        onLoadMore()
+                    }
+                }
+            }
+        })
+    }
+
+    // 추가 로드 동작을 자식 어뎁터에서 구현
+    protected abstract fun onLoadMore()
+
+    // 데이터 추가 액션 완료 시 호출
+    fun setLoadingComplete() {
+        isLoading = false // 로딩 완료
+
+        // 화면이 채워졌는지 확인
+        recyclerView.post {
+            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+            val visibleItemCount = layoutManager.childCount
+            val totalItemCount = layoutManager.itemCount
+            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+            // 화면이 채워지지 않은 경우 onLoadMore 강제 호출
+            if ((visibleItemCount + firstVisibleItemPosition) < totalItemCount) {
+                return@post
+            }
+
+            if (!isLoading && totalItemCount > 0) {
+                isLoading = true
+                onLoadMore()
+            }
+        }
     }
 
     // 특정 인덱스의 아이템을 반환

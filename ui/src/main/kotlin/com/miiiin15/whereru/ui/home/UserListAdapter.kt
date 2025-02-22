@@ -12,11 +12,11 @@ import com.miiiin15.whereru.ui.base.adapter.BaseViewHolder
 import com.miiiin15.whereru.ui.databinding.ItemUserListBinding
 
 class UserListAdapter(
-    private val onClickListener: OnUserItemClickListener
+    private val onClickListener: OnUserItemClickListener,
+    private val onLoadMoreListener: OnLoadMoreListener
 ) :
     BaseAdapter<UserUiModel, UserListAdapter.BaseUserListAdapter<out ViewDataBinding>>() {
     private var emptyView: LinearLayout? = null
-
 
     override fun getViewHolder(
         parent: ViewGroup,
@@ -28,6 +28,11 @@ class UserListAdapter(
         val diffCallback = UserDiffCallback(this.items, items)
         resetAll(items, diffCallback)
         checkEmptyView()
+        setLoadingComplete()
+    }
+
+    override fun onLoadMore() {
+        onLoadMoreListener.onLoadMore()
     }
 
     fun setEmptyView(view: LinearLayout) {
@@ -48,7 +53,12 @@ class UserListAdapter(
     }
 
     inner class LinearUserListViewHolder(parent: ViewGroup) :
-        BaseUserListAdapter<ItemUserListBinding>(parent, R.layout.item_user_list, onClickListener) {
+        BaseUserListAdapter<ItemUserListBinding>(
+            parent,
+            R.layout.item_user_list,
+            onClickListener,
+            onLoadMoreListener
+        ) {
         override val userBinding: ItemUserListBinding
             get() = binding
     }
@@ -56,7 +66,8 @@ class UserListAdapter(
     abstract class BaseUserListAdapter<B : ViewDataBinding>(
         parent: ViewGroup,
         layoutResId: Int,
-        onClickListener: OnUserItemClickListener
+        onClickListener: OnUserItemClickListener,
+        onLoadMoreListener: OnLoadMoreListener
     ) :
         BaseViewHolder<B, UserUiModel>(
             parent,
@@ -73,12 +84,12 @@ class UserListAdapter(
         override fun setData(data: UserUiModel) {
             userBinding.userInfo = data
             userBinding.executePendingBindings()
-           userBinding.userItemStatusImage.visibility =
-               if (data.sessionId.isNullOrBlank()) View.GONE else View.VISIBLE
+            userBinding.userItemStatusImage.visibility =
+                if (data.sessionId.isNullOrBlank()) View.GONE else View.VISIBLE
 
-            if(!data.profileImageUrl.isNullOrBlank()){
-            userBinding.userItemProfileImage.backgroundTintList =
-                ColorStateList.valueOf(data.profileImageUrl!!.toInt())
+            if (!data.profileImageUrl.isNullOrBlank()) {
+                userBinding.userItemProfileImage.backgroundTintList =
+                    ColorStateList.valueOf(data.profileImageUrl!!.toInt())
             }
         }
 
