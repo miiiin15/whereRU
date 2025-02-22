@@ -55,6 +55,7 @@ class ProfileViewModel @Inject constructor(
             userId = uid,
             nickname = nickname.value.takeIf { !it.isNullOrBlank() } ?: "유저_${uid.substring(0, 6)}",
             profileImageUrl = selectedColor.value.toString(),
+            sessionId = authSessionManager.targetSessionId ?: "",
             lastLoginAt = System.currentTimeMillis(),
             fcmToken = myProfile.value?.fcmToken
         ).collectDataResource({
