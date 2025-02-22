@@ -66,7 +66,7 @@ class ProfileFragment :
                 viewModel.setSelectedColor(color)
             })
             .setNegativeButton("취소") { dialog, _ -> dialog.dismiss() }
-            .attachAlphaSlideBar(true)
+            .attachAlphaSlideBar(false)
             .attachBrightnessSlideBar(true) // 밝기 슬라이더 추가
             .setBottomSpace(12) // 하단 여백
             .show()
