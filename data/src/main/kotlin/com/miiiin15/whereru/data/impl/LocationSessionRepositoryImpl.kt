@@ -47,6 +47,15 @@ internal class LocationSessionRepositoryImpl @Inject constructor(
             locationRemoteDataSource.getRecentSessionList(userId)
         }
 
+    override fun getPaginatedSessionList(
+        userId: String,
+        lastVisible: Long?,
+        pageSize: Int
+    ): Flow<DataResource<List<JoinedSession>>> =
+        flowDataResource {
+            locationRemoteDataSource.getPaginatedSessionList(userId, lastVisible, pageSize)
+        }
+
     override fun participationSession(
         userId: String,
         targetSessionId: String,

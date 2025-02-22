@@ -36,6 +36,13 @@ class LocationSessionRemoteDataSourceImpl @Inject constructor(
     override suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity> =
         firebaseService.getRecentSessionList(userId)
 
+    override suspend fun getPaginatedSessionList(
+        userId: String,
+        lastVisible: Long?,
+        pageSize: Int
+    ): List<JoinedSessionEntity> =
+        firebaseService.getPaginatedSessionList(userId, lastVisible, pageSize)
+
     override suspend fun participationSession(
         userId: String,
         targetSessionId: String,

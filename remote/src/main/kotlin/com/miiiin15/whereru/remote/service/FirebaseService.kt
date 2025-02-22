@@ -55,6 +55,12 @@ interface FirebaseService {
 
     suspend fun getRecentSessionList(userId: String): List<JoinedSessionEntity>
 
+    suspend fun getPaginatedSessionList(
+        userId: String,
+        lastVisible: Long?,
+        pageSize: Int
+    ): List<JoinedSessionEntity>
+
     suspend fun participationSession(
         userId: String,
         targetSessionId: String,

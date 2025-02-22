@@ -20,6 +20,12 @@ interface LocationSessionRepository {
 
     fun getRecentSessionList(userId: String): Flow<DataResource<List<JoinedSession>>>
 
+    fun getPaginatedSessionList(
+        userId: String,
+        lastVisible: Long?,
+        pageSize: Int
+    ): Flow<DataResource<List<JoinedSession>>>
+
     fun participationSession(
         userId: String,
         targetSessionId: String,

@@ -129,6 +129,34 @@ class FirebaseServiceImpl @Inject constructor(
     }
 
     /**
+     * 최근 참여한 세션 범위 조회
+     * **/
+    override suspend fun getPaginatedSessionList(
+        userId: String,
+        lastVisible: Long?,
+        pageSize: Int
+    ): List<JoinedSessionEntity> {
+        return runCatching {
+            val query = firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
+                .orderBy("participationTime", Query.Direction.DESCENDING) // 정렬 기준 필드
+
+            // lastVisible이 null이 아닐 경우에만 startAfter 추가
+            val paginatedQuery = lastVisible?.let {
+                query.startAfter(it)
+            } ?: query
+
+            paginatedQuery
+                .limit(pageSize.toLong())
+                .get()
+                .await()
+                .documents.map { document ->
+                    document.toObject(JoinedSessionEntity::class.java)
+                        ?.copy(sessionId = document.id)
+                }.filterNotNull()
+        }.getOrElse { throw Exception("세션 범위 조회 실패: ${it.message}") }
+    }
+
+    /**
      * 세션 참가
      * **/
     override suspend fun participationSession(
