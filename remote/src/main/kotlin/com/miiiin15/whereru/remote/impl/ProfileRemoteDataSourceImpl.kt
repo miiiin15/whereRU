@@ -12,6 +12,12 @@ class ProfileRemoteDataSourceImpl @Inject constructor(
     override suspend fun getAllProfiles(): List<ProfileEntity> =
         firebaseService.getAllProfiles()
 
+    override suspend fun getPaginatedProfiles(
+        lastVisible: Long?,
+        pageSize: Int
+    ): List<ProfileEntity> =
+        firebaseService.getPaginatedProfiles(lastVisible, pageSize)
+
     override suspend fun getProfile(userId: String): ProfileEntity =
         firebaseService.getProfile(userId)
 

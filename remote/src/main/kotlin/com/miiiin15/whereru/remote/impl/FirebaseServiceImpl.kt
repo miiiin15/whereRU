@@ -8,6 +8,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
 import com.miiiin15.whereru.data.model.JoinedSessionEntity
 import com.miiiin15.whereru.data.model.ProfileEntity
@@ -168,12 +169,33 @@ class FirebaseServiceImpl @Inject constructor(
      * **/
     override suspend fun getAllProfiles(): List<ProfileEntity> {
         return runCatching {
-            firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
+            firebaseFirestore.collection(FirebasePaths.TEST_USER_PROFILE)
                 .get()
                 .await()
                 .toObjects(ProfileEntity::class.java)
         }.getOrElse { throw Exception("프로필 조회 실패: ${it.message}") }
     }
+
+    /**
+     * 모든 프로필 범위 조회
+     * **/
+override suspend fun getPaginatedProfiles(lastVisible: Long?, pageSize: Int): List<ProfileEntity> {
+    return runCatching {
+        val query = firebaseFirestore.collection(FirebasePaths.USER_PROFILE)
+            .orderBy("lastLoginAt", Query.Direction.DESCENDING) // 정렬 기준 필드
+
+        // lastVisible이 null이 아닐 경우에만 startAfter 추가
+        val paginatedQuery = lastVisible?.let {
+            query.startAfter(it)
+        } ?: query
+
+        paginatedQuery
+            .limit(pageSize.toLong())
+            .get()
+            .await()
+            .toObjects(ProfileEntity::class.java)
+    }.getOrElse { throw Exception("프로필 범위 조회 실패: ${it.message}") }
+}
 
     /**
      * 단일 프로필 조회

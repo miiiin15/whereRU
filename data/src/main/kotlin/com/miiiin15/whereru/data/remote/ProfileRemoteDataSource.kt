@@ -4,6 +4,7 @@ import com.miiiin15.whereru.data.model.ProfileEntity
 
 interface ProfileRemoteDataSource {
     suspend fun getAllProfiles(): List<ProfileEntity>
+    suspend fun getPaginatedProfiles(lastVisible: Long?, pageSize: Int): List<ProfileEntity>
     suspend fun getProfile(userId: String): ProfileEntity
     suspend fun setProfile(user: ProfileEntity): Unit
     suspend fun updateProfileSessionId(userId: String, sessionId: String): Unit

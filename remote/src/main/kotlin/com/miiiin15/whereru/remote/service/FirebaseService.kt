@@ -28,6 +28,11 @@ interface FirebaseService {
 
     suspend fun getAllProfiles(): List<ProfileEntity>
 
+    suspend fun getPaginatedProfiles(
+        lastVisible: Long?,
+        pageSize: Int
+    ): List<ProfileEntity>
+
     suspend fun getProfile(userId: String): ProfileEntity
 
     suspend fun setProfile(

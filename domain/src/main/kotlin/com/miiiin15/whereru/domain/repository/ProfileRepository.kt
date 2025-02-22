@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 // 사용자 관련
 interface ProfileRepository {
     fun getAllProfiles(): Flow<DataResource<List<User>>>
+    fun getPaginatedProfiles(lastVisible: Long?, pageSize: Int): Flow<DataResource<List<User>>>
     fun getProfile(userId: String): Flow<DataResource<User>>
     fun setProfile(user: User): Flow<DataResource<Unit>>
     fun updateProfileSessionId(userId: String, sessionId:String): Flow<DataResource<Unit>>

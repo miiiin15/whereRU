@@ -18,6 +18,14 @@ internal class ProfileRepositoryImpl @Inject constructor(
             profileRemoteDataSource.getAllProfiles()
         }
 
+    override fun getPaginatedProfiles(
+        lastVisible: Long?,
+        pageSize: Int
+    ): Flow<DataResource<List<User>>> =
+        flowDataResource {
+            profileRemoteDataSource.getPaginatedProfiles(lastVisible, pageSize)
+        }
+
     override fun getProfile(userId: String): Flow<DataResource<User>> =
         flowDataResource {
             profileRemoteDataSource.getProfile(userId)
