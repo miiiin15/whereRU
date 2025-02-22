@@ -8,7 +8,7 @@ import com.miiiin15.whereru.domain.model.PushType
 import com.miiiin15.whereru.domain.model.ResponseType
 import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.fcm.SendPushMessageUseCase
-import com.miiiin15.whereru.domain.usecase.profile.GetAllProfilesUseCase
+import com.miiiin15.whereru.domain.usecase.profile.GetPaginatedProfilesUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetProfileUseCase
 import com.miiiin15.whereru.domain.usecase.profile.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.domain.usecase.session.CreateSessionUseCase
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getAllProfilesUseCase: GetAllProfilesUseCase,
+    private val getPaginatedProfilesUseCase: GetPaginatedProfilesUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val getRecentSessionListUseCase: GetRecentSessionListUseCase,
     private val participationSessionUseCase: ParticipationSessionUseCase,
@@ -56,13 +56,18 @@ class HomeViewModel @Inject constructor(
 
     val fetched = MutableLiveData(false)
 
+    private val pageSize = 15
+
+    private var lastUserVisible: Long? = null // 마지막 값을 저장할 변수
+    var hasMoreUserData = true // 더 가저올 유저 데이터가 있나
+
     init {
         fetchList()
     }
 
-    fun fetchList() {
-        getAllProfile()
+    private fun fetchList() {
         getRecentSessionList()
+        loadPaginatedUserList(true)
         // TODO : 친구 목록 가져오기
     }
 
@@ -82,16 +87,29 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // 전체 유저 목록 가져오기
-    fun getAllProfile() = launch {
-        getAllProfilesUseCase()
+    // 유저 목록 가져오기 nextPage : true면 다음 페이지, false면 초기화
+    fun loadPaginatedUserList(nextPage: Boolean) = launch {
+        if (!nextPage) {
+            lastUserVisible = null
+            hasMoreUserData = true
+        } else if (!hasMoreUserData) return@launch
+
+        getPaginatedProfilesUseCase(if (nextPage) lastUserVisible else null, pageSize)
             .mapDataResource { list ->
+                if (list.isNotEmpty()) {
+                    lastUserVisible = list.last().lastLoginAt
+                }
                 list.filter { it.userId != authSessionManager.uid }
                     .sortedByDescending { it.lastLoginAt }
                     .map { it.toPresentation() }
             }
-            .collectDataResource({
-                _userList.value = it
+            .collectDataResource({ result ->
+                _userList.value = if (nextPage) {
+                    _userList.value + result
+                } else {
+                    result
+                }
+                hasMoreUserData = result.size == pageSize
             })
     }
 

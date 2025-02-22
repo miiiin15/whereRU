@@ -30,23 +30,41 @@ class HomeFragment :
     override val viewModel: HomeViewModel by viewModels()
     private var currentCategory: Category = Category.RECENT
 
+    private var viewPagerAdapter: ViewPagerAdapter? = null
+
+    private var isAdapterInitialized =
+        mutableMapOf("sessionList" to false, "allUserList" to false, "friendList" to false)
+
     private val sessionListAdapter: SessionListAdapter by lazy {
         SessionListAdapter(object : OnSessionItemClickListener {
             override fun onSessionItemClick(session: JoinedSessionUiModel) =
                 recentSessionClickAction(session)
-        }
-        )
+        }, object : OnLoadMoreListener {
+            override fun onLoadMore() {
+                // TODO : 세션 목록 더보기 액션
+            }
+        })
     }
     private val userListAdapter: UserListAdapter by lazy {
         UserListAdapter(object : OnUserItemClickListener {
             override fun onUserItemClick(user: UserUiModel) =
                 allUserClickAction(user)
+        }, object : OnLoadMoreListener {
+            override fun onLoadMore() {
+                if (viewModel.hasMoreUserData) {
+                    viewModel.loadPaginatedUserList(true)
+                }
+            }
         })
     }
     private val friendListAdapter: UserListAdapter by lazy {
         UserListAdapter(object : OnUserItemClickListener {
             override fun onUserItemClick(user: UserUiModel) {
                 // TODO : 친구 목록 아이템 클릭 액션
+            }
+        }, object : OnLoadMoreListener {
+            override fun onLoadMore() {
+                // TODO : 친구 목록 더보기 액션
             }
         })
     }
@@ -106,7 +124,7 @@ class HomeFragment :
                 binding.homeCategoryMotionLayout.transitionToEnd()
                 when (currentCategory) {
                     Category.RECENT -> viewModel.getRecentSessionList()
-                    Category.ALL -> viewModel.getAllProfile()
+                    Category.ALL -> viewModel.loadPaginatedUserList(false)
                     Category.FRIEND -> {}
                 }
             }
