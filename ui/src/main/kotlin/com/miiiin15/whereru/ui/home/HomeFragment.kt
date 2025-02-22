@@ -133,6 +133,22 @@ class HomeFragment :
                         ColorStateList.valueOf(my.profileImageUrl!!.toInt())
                 }
             }
+
+            sessionList observe { data ->
+                if (isAdapterInitialized["sessionList"] == true) {
+                    sessionListAdapter.resetAll(data)
+                }
+            }
+            userList observe { data ->
+                if (isAdapterInitialized["allUserList"] == true) {
+                    userListAdapter.resetAll(data)
+                }
+            }
+            friendList observe { data ->
+                if (isAdapterInitialized["friendList"] == true) {
+                    friendListAdapter.resetAll(data)
+                }
+            }
         }
 
         setViewPager()
@@ -185,53 +201,52 @@ class HomeFragment :
             }
         }
 
-        homePagerView.adapter = ViewPagerAdapter(this)
         categoryTexts.forEachIndexed { index, textView ->
             textView.setOnClickListener {
                 homePagerView.currentItem = index
             }
         }
 
-        homePagerView.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                currentCategory = Category.values()[position]
-                categoryTexts.forEachIndexed { index, textView ->
-                    textView.setTextColor(
-                        if (index == position) resources.getColor(R.color.black)
-                        else resources.getColor(R.color.gray1)
-                    )
+        homePagerView.apply {
+            adapter = ViewPagerAdapter(this@HomeFragment).also { viewPagerAdapter = it }
+            offscreenPageLimit = Category.values().size
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    currentCategory = Category.values()[position]
+                    categoryTexts.forEachIndexed { index, textView ->
+                        textView.setTextColor(
+                            if (index == position) resources.getColor(R.color.black)
+                            else resources.getColor(R.color.gray1)
+                        )
+                    }
                 }
-            }
-        })
+            })
+        }
+
     }
 
     // ViewPager2 Adapter 내부 바인딩 용
     fun bindViewPager(position: Int, recyclerView: RecyclerView, emptyView: LinearLayout) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
         when (position) {
             0 -> {
                 recyclerView.adapter = sessionListAdapter
                 sessionListAdapter.setEmptyView(emptyView)
-                viewModel.sessionList.observe { data ->
-                    sessionListAdapter.resetAll(data)
-                }
+                isAdapterInitialized["sessionList"] = true
             }
 
             1 -> {
                 recyclerView.adapter = userListAdapter
                 userListAdapter.setEmptyView(emptyView)
-                viewModel.userList.observe { data ->
-                    userListAdapter.resetAll(data)
-                }
+                isAdapterInitialized["allUserList"] = true
             }
 
             2 -> {
                 recyclerView.adapter = friendListAdapter
                 friendListAdapter.setEmptyView(emptyView)
-                viewModel.friendList.observe { data ->
-                    friendListAdapter.resetAll(data)
-                }
+                isAdapterInitialized["friendList"] = true
             }
         }
     }
