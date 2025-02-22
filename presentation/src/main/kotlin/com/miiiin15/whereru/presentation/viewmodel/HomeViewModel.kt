@@ -14,7 +14,7 @@ import com.miiiin15.whereru.domain.usecase.profile.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.domain.usecase.session.CreateSessionUseCase
 import com.miiiin15.whereru.domain.usecase.session.DeleteSessionUseCase
 import com.miiiin15.whereru.domain.usecase.session.ExitSessionUserCase
-import com.miiiin15.whereru.domain.usecase.session.GetRecentSessionListUseCase
+import com.miiiin15.whereru.domain.usecase.session.GetPaginatedSessionListUserCase
 import com.miiiin15.whereru.domain.usecase.session.ParticipationSessionUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
@@ -32,7 +32,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getPaginatedProfilesUseCase: GetPaginatedProfilesUseCase,
     private val getProfileUseCase: GetProfileUseCase,
-    private val getRecentSessionListUseCase: GetRecentSessionListUseCase,
+    private val getPaginatedSessionListUserCase: GetPaginatedSessionListUserCase,
     private val participationSessionUseCase: ParticipationSessionUseCase,
     private val exitSessionUseCase: ExitSessionUserCase,
     private val createSessionUseCase: CreateSessionUseCase,
@@ -58,6 +58,9 @@ class HomeViewModel @Inject constructor(
 
     private val pageSize = 15
 
+    private var lastSessionVisible: Long? = null // 마지막 값을 저장할 변수
+    private var lastSessionPageSize = 0 // 페이지 사이즈
+
     private var lastUserVisible: Long? = null // 마지막 값을 저장할 변수
     var hasMoreUserData = true // 더 가저올 유저 데이터가 있나
 
@@ -66,7 +69,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun fetchList() {
-        getRecentSessionList()
+        loadPaginatedSessionList(true)
         loadPaginatedUserList(true)
         // TODO : 친구 목록 가져오기
     }
@@ -113,17 +116,29 @@ class HomeViewModel @Inject constructor(
             })
     }
 
-    // 최근 입장한 세션 목록 가져오기
-    fun getRecentSessionList() = launch {
-        authSessionManager.uid.let { uid ->
-            getRecentSessionListUseCase(uid!!).mapDataResource { list ->
-                list.sortedByDescending { it.participationTime }
-                    .map { it.toPresentation() }
-            }
-                .collectDataResource({
-                    _sessionList.value = it
-                })
+   // 최근 입장한 세션 목록 가져오기 nextPage : true면 다음 페이지, false면 초기화
+    fun loadPaginatedSessionList(nextPage: Boolean) = launch {
+        if (!nextPage) {
+            lastSessionVisible = null
         }
+
+        getPaginatedSessionListUserCase(
+            authSessionManager.uid!!,
+            if (nextPage) lastSessionVisible else null,
+            pageSize
+        ).mapDataResource { list ->
+            if (list.isNotEmpty()) {
+                lastSessionVisible = list.last().participationTime
+            }
+            list.sortedByDescending { it.participationTime }
+                .map { it.toPresentation() }
+        }.collectDataResource({ result ->
+            _sessionList.value = if (nextPage) {
+                _sessionList.value + result
+            } else {
+                result
+            }
+        })
     }
 
     // 세션 참가 및 기록 저장

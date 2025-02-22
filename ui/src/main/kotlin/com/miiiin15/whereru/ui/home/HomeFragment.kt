@@ -78,7 +78,7 @@ class HomeFragment :
                 if (!viewModel.fetched.value!!) {
                     viewModel.fetchProfile()
                 }
-                viewModel.getRecentSessionList()
+                viewModel.loadPaginatedSessionList(false)
             }
         }
 
@@ -123,7 +123,7 @@ class HomeFragment :
             homeRefreshButton.setOnClickListener {
                 binding.homeCategoryMotionLayout.transitionToEnd()
                 when (currentCategory) {
-                    Category.RECENT -> viewModel.getRecentSessionList()
+                    Category.RECENT -> viewModel.loadPaginatedSessionList(false)
                     Category.ALL -> viewModel.loadPaginatedUserList(false)
                     Category.FRIEND -> {}
                 }
