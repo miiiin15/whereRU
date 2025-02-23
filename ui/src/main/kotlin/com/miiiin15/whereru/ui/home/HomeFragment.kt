@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -77,7 +78,7 @@ class HomeFragment :
         // 다른 화면 갔다가 돌아 왔을 때
         findNavController().addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.homeFragment) {
-                if (!viewModel.fetched.value!!) {
+                if (!viewModel.profileFetched.value!!) {
                     viewModel.fetchProfile()
                     viewModel.loadPaginatedSessionList(false)
                 }
@@ -99,6 +100,10 @@ class HomeFragment :
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // 화면 전환 정지 걸어 놓고 로그인 화면에서 로딩 시작한 것 처럼
+        viewModel.showLoading("homeFragment")
+        postponeEnterTransition()
 
         binding {
             vm = viewModel
@@ -157,6 +162,18 @@ class HomeFragment :
             sessionList observe { data ->
                 if (isAdapterInitialized["sessionList"] == true) {
                     sessionListAdapter.resetAll(data)
+
+                    // 그려지면 전환
+                    sessionListAdapter.recyclerView.doOnPreDraw {
+                        viewModel.hideLoading("homeFragment")
+                        startPostponedEnterTransition()
+                    }
+                }
+
+                // 없어도 전환
+                if (data.isEmpty()) {
+                    viewModel.hideLoading("homeFragment")
+                    startPostponedEnterTransition()
                 }
             }
             userList observe { data ->
@@ -281,6 +298,8 @@ class HomeFragment :
     }
 
     private fun recentSessionClickAction(session: JoinedSessionUiModel) {
+        if (!viewModel.isSessionFetched() || !viewModel.isProfileFetched()) return
+
         showCustomBottomSheet(
             "${session.hostNickname}님의 세션\n최근 입장 시간 : ${session.participationTime}",
             "삭제",
@@ -295,6 +314,8 @@ class HomeFragment :
     }
 
     private fun allUserClickAction(user: UserUiModel) {
+        if (!viewModel.isUserFetched() || !viewModel.isProfileFetched()) return
+
         val notOpenedSession = user.sessionId.isNullOrBlank()
         val rightButtonText = if (notOpenedSession) "공유 요청" else "세션 입장"
         val sessionStateText = if (notOpenedSession) {
@@ -340,6 +361,16 @@ class HomeFragment :
                     }
 
                     null -> {}
+                }
+            }
+
+            is ShowAlert -> {
+                showCustomAlert(event.message)
+            }
+
+            is ShowErrorAlert -> {
+                showCustomAlert(event.throwable.message ?: "Unknown error") {
+                    startPostponedEnterTransition()
                 }
             }
         }
