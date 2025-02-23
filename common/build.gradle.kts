@@ -3,7 +3,7 @@ plugins {
 }
 
 android{
-    namespace = "ted.gun0912.movie.common"
+    namespace = "com.miiiin15.whereru.common"
 }
 
 dependencies{
