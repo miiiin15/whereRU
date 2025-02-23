@@ -9,7 +9,10 @@ import com.miiiin15.whereru.local.room.RoomConstant
 interface ProfileDao : BaseDao<ProfileLocal> {
 
     // 유저 목록 조회
-     @Query("SELECT * FROM ${RoomConstant.Table.USERS}")
-     suspend fun getInitialProfiles(): List<ProfileLocal>
+    @Query("SELECT * FROM ${RoomConstant.Table.USERS}")
+    suspend fun getInitialProfiles(): List<ProfileLocal>
 
+    // 유저 목록 초기화
+    @Query("DELETE FROM ${RoomConstant.Table.USERS}")
+    suspend fun clearProfiles()
 }
