@@ -1,6 +1,7 @@
 package com.miiiin15.whereru.data.impl
 
 import com.miiiin15.whereru.data.bound.flowDataResource
+import com.miiiin15.whereru.data.local.LocationSessionLocalDataSource
 import com.miiiin15.whereru.data.remote.LocationSessionRemoteDataSource
 import com.miiiin15.whereru.data_resource.DataResource
 import com.miiiin15.whereru.domain.model.JoinedSession
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal class LocationSessionRepositoryImpl @Inject constructor(
-    private val locationRemoteDataSource: LocationSessionRemoteDataSource
+    private val locationRemoteDataSource: LocationSessionRemoteDataSource,
+    private val locationLocalDataSource: LocationSessionLocalDataSource,
 ) : LocationSessionRepository {
 
     override fun createSession(sessionId: String, hostId: String): Flow<DataResource<Unit>> =
@@ -52,9 +54,11 @@ internal class LocationSessionRepositoryImpl @Inject constructor(
         lastVisible: Long?,
         pageSize: Int
     ): Flow<DataResource<List<JoinedSession>>> =
-        flowDataResource {
-            locationRemoteDataSource.getPaginatedSessionList(userId, lastVisible, pageSize)
-        }
+        flowDataResource(
+            { locationRemoteDataSource.getPaginatedSessionList(userId, lastVisible, pageSize) },
+            { locationLocalDataSource.getInitialJoinedSessions() },
+            { locationLocalDataSource.saveInitialJoinedSessions(it) }
+        )
 
     override fun participationSession(
         userId: String,
@@ -76,6 +80,4 @@ internal class LocationSessionRepositoryImpl @Inject constructor(
         flowDataResource {
             locationRemoteDataSource.exitSession(userId, targetSessionId)
         }
-
-    // TODO : local과 연계
 }

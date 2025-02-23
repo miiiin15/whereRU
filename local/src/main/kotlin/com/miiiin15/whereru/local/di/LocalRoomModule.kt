@@ -30,4 +30,8 @@ internal object LocalRoomModule {
     @Provides
     @Singleton
     fun provideProfileDao(database: AppDatabase): ProfileDao = database.profileDao()
+
+    @Provides
+    @Singleton
+    fun provideJoinedSessionDao(database: AppDatabase) = database.joinedSessionDao()
 }
