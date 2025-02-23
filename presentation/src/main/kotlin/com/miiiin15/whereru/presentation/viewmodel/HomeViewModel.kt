@@ -56,12 +56,13 @@ class HomeViewModel @Inject constructor(
 
     val fetched = MutableLiveData(false)
 
-    private val pageSize = 15
 
     private var lastSessionVisible: Long? = null // 마지막 값을 저장할 변수
-    private var lastSessionPageSize = 0 // 페이지 사이즈
+    private var lastSessionPageSize = 15
+    var hasMoreSessionData = true // 더 가저올 세션 데이터가 있나
 
     private var lastUserVisible: Long? = null // 마지막 값을 저장할 변수
+    private val lastUserPageSize = 15
     var hasMoreUserData = true // 더 가저올 유저 데이터가 있나
 
     init {
@@ -97,7 +98,7 @@ class HomeViewModel @Inject constructor(
             hasMoreUserData = true
         } else if (!hasMoreUserData) return@launch
 
-        getPaginatedProfilesUseCase(if (nextPage) lastUserVisible else null, pageSize)
+        getPaginatedProfilesUseCase(if (nextPage) lastUserVisible else null, lastUserPageSize)
             .mapDataResource { list ->
                 if (list.isNotEmpty()) {
                     lastUserVisible = list.last().lastLoginAt
@@ -112,7 +113,7 @@ class HomeViewModel @Inject constructor(
                 } else {
                     result
                 }
-                hasMoreUserData = result.size == pageSize
+                hasMoreUserData = result.size == lastUserPageSize
             })
     }
 
@@ -120,12 +121,12 @@ class HomeViewModel @Inject constructor(
     fun loadPaginatedSessionList(nextPage: Boolean) = launch {
         if (!nextPage) {
             lastSessionVisible = null
-        }
+        }else if (!hasMoreSessionData) return@launch
 
         getPaginatedSessionListUserCase(
             authSessionManager.uid!!,
             if (nextPage) lastSessionVisible else null,
-            pageSize
+            lastUserPageSize
         ).mapDataResource { list ->
             if (list.isNotEmpty()) {
                 lastSessionVisible = list.last().participationTime
@@ -138,6 +139,7 @@ class HomeViewModel @Inject constructor(
             } else {
                 result
             }
+            hasMoreSessionData = result.size == lastSessionPageSize
         })
     }
 

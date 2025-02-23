@@ -41,7 +41,9 @@ class HomeFragment :
                 recentSessionClickAction(session)
         }, object : OnLoadMoreListener {
             override fun onLoadMore() {
-                // TODO : 세션 목록 더보기 액션
+                if (viewModel.hasMoreSessionData) {
+                    viewModel.loadPaginatedSessionList(true)
+                }
             }
         })
     }
@@ -77,8 +79,8 @@ class HomeFragment :
             if (destination.id == R.id.homeFragment) {
                 if (!viewModel.fetched.value!!) {
                     viewModel.fetchProfile()
+                    viewModel.loadPaginatedSessionList(false)
                 }
-                viewModel.loadPaginatedSessionList(false)
             }
         }
 
