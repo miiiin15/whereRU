@@ -1,6 +1,7 @@
 package com.miiiin15.whereru.data.impl
 
 import com.miiiin15.whereru.data.bound.flowDataResource
+import com.miiiin15.whereru.data.local.ProfileLocalDataSource
 import com.miiiin15.whereru.data.model.ProfileEntity
 import com.miiiin15.whereru.data.remote.ProfileRemoteDataSource
 import com.miiiin15.whereru.data_resource.DataResource
@@ -11,6 +12,7 @@ import javax.inject.Inject
 
 internal class ProfileRepositoryImpl @Inject constructor(
     private val profileRemoteDataSource: ProfileRemoteDataSource,
+    private val profileLocalDataSource: ProfileLocalDataSource,
 ) : ProfileRepository {
 
     override fun getAllProfiles(): Flow<DataResource<List<User>>> =
@@ -22,9 +24,11 @@ internal class ProfileRepositoryImpl @Inject constructor(
         lastVisible: Long?,
         pageSize: Int
     ): Flow<DataResource<List<User>>> =
-        flowDataResource {
-            profileRemoteDataSource.getPaginatedProfiles(lastVisible, pageSize)
-        }
+        flowDataResource(
+            { profileRemoteDataSource.getPaginatedProfiles(lastVisible, pageSize) },
+            { profileLocalDataSource.getInitialProfiles() },
+            { profileLocalDataSource.saveInitialProfiles(it) },
+        )
 
     override fun getProfile(userId: String): Flow<DataResource<User>> =
         flowDataResource {
@@ -63,5 +67,4 @@ internal class ProfileRepositoryImpl @Inject constructor(
             profileRemoteDataSource.updateFcmToken(userId, fcmToken)
         }
 
-    // TODO : local과 연계
 }
