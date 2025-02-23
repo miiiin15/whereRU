@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
 import com.miiiin15.whereru.data.model.JoinedSessionEntity
 import com.miiiin15.whereru.data.model.ProfileEntity
@@ -133,13 +134,23 @@ class FirebaseServiceImpl @Inject constructor(
         lastVisible: Long?,
         pageSize: Int
     ): List<JoinedSessionEntity> {
-        return firebaseFirestore.getPaginatedDocuments<JoinedSessionEntity>(
-            collectionPath = "${FirebasePaths.JOINED_SESSIONS}/$userId/sessions",
-            orderByField = "participationTime",
-            lastVisible = lastVisible,
-            pageSize = pageSize,
-            errorLabel = "세션 범위 조회 실패"
-        )
+        return runCatching {
+            val query = firebaseFirestore.collection("${FirebasePaths.JOINED_SESSIONS}/$userId/sessions")
+                .orderBy("participationTime", Query.Direction.DESCENDING) // 정렬 기준 필드
+
+            val paginatedQuery = lastVisible?.let {
+                query.startAfter(it)
+            } ?: query
+
+            paginatedQuery
+                .limit(pageSize.toLong())
+                .get()
+                .await()
+                .documents.map { document ->
+                    document.toObject(JoinedSessionEntity::class.java)
+                        ?.copy(sessionId = document.id)
+                }.filterNotNull()
+        }.getOrElse { throw Exception("세션 범위 조회 실패: ${it.message}") }
     }
 
     /**
