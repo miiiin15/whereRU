@@ -70,7 +70,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun fetchList() {
-        loadPaginatedSessionList(true)
         loadPaginatedUserList(true)
         // TODO : 친구 목록 가져오기
     }
@@ -104,7 +103,6 @@ class HomeViewModel @Inject constructor(
                     lastUserVisible = list.last().lastLoginAt
                 }
                 list.filter { it.userId != authSessionManager.uid }
-                    .sortedByDescending { it.lastLoginAt }
                     .map { it.toPresentation() }
             }
             .collectDataResource({ result ->
@@ -117,11 +115,11 @@ class HomeViewModel @Inject constructor(
             })
     }
 
-   // 최근 입장한 세션 목록 가져오기 nextPage : true면 다음 페이지, false면 초기화
+    // 최근 입장한 세션 목록 가져오기 nextPage : true면 다음 페이지, false면 초기화
     fun loadPaginatedSessionList(nextPage: Boolean) = launch {
         if (!nextPage) {
             lastSessionVisible = null
-        }else if (!hasMoreSessionData) return@launch
+        } else if (!hasMoreSessionData) return@launch
 
         getPaginatedSessionListUserCase(
             authSessionManager.uid!!,
@@ -131,8 +129,7 @@ class HomeViewModel @Inject constructor(
             if (list.isNotEmpty()) {
                 lastSessionVisible = list.last().participationTime
             }
-            list.sortedByDescending { it.participationTime }
-                .map { it.toPresentation() }
+            list.map { it.toPresentation() }
         }.collectDataResource({ result ->
             _sessionList.value = if (nextPage) {
                 _sessionList.value + result
