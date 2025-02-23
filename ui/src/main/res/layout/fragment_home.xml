@@ -28,7 +28,6 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_horizontal"
             android:layout_marginTop="@dimen/margin_top_title"
-            android:layout_marginBottom="@dimen/margin_title_to_content"
             app:shimmer_auto_start="true"
             app:shimmer_duration="2000">
 
@@ -75,6 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bottom_border"
+            android:layout_marginTop="@dimen/margin_title_to_content"
             android:paddingHorizontal="@dimen/padding_horizontal"
             android:paddingVertical="8dp">
 
@@ -148,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_horizontal"
             android:layout_marginBottom="@dimen/margin_bottom_button"
-            android:enabled="@{vm.fetched}"
+            android:enabled="@{vm.profileFetched}"
             android:text="내 위치 공유하기" />
 
     </LinearLayout>

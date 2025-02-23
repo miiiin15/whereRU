@@ -1,6 +1,5 @@
 package com.miiiin15.whereru.presentation.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import com.miiiin15.whereru.common.utils.UUIDUtil
 import com.miiiin15.whereru.data_resource.mapDataResource
 import com.miiiin15.whereru.domain.model.PushMessage
@@ -45,7 +44,7 @@ class HomeViewModel @Inject constructor(
     private val _myProfile = MutableStateFlow<UserUiModel?>(null)
     val myProfile = _myProfile.asStateFlow()
 
-    private val _sessionList = MutableStateFlow<List<JoinedSessionUiModel>>(emptyList())
+    private val _sessionList = MutableStateFlow<List<JoinedSessionUiModel>?>(null)
     val sessionList = _sessionList.asStateFlow()
 
     private val _userList = MutableStateFlow<List<UserUiModel>>(emptyList())
@@ -53,9 +52,6 @@ class HomeViewModel @Inject constructor(
 
     private val _friendList = MutableStateFlow<List<UserUiModel>>(emptyList())
     val friendList = _friendList.asStateFlow()
-
-    val fetched = MutableLiveData(false)
-
 
     private var lastSessionVisible: Long? = null // 마지막 값을 저장할 변수
     private var lastSessionPageSize = 15
@@ -65,13 +61,24 @@ class HomeViewModel @Inject constructor(
     private val lastUserPageSize = 15
     var hasMoreUserData = true // 더 가저올 유저 데이터가 있나
 
-    init {
-        fetchList()
+    val profileFetched = MutableStateFlow(false)
+    private val userFetched = MutableStateFlow(false)
+    private val sessionFetched = MutableStateFlow(false)
+
+    private fun isFetched(fetchedState: MutableStateFlow<Boolean>, errorMessage: String): Boolean {
+        if (!fetchedState.value) {
+            event(Event.ShowAlert(errorMessage))
+            return false
+        }
+        return true
     }
 
-    private fun fetchList() {
+    fun isProfileFetched() = isFetched(profileFetched, "프로필 데이터가 로드중 입니다.")
+    fun isUserFetched() = isFetched(userFetched, "유저 데이터가 로드중 입니다.")
+    fun isSessionFetched() = isFetched(sessionFetched, "세션 데이터가 로드중 입니다.")
+
+    init {
         loadPaginatedUserList(true)
-        // TODO : 친구 목록 가져오기
     }
 
     // 내 프로필 가져오기
@@ -83,7 +90,7 @@ class HomeViewModel @Inject constructor(
                     onSuccess = { profile ->
                         authSessionManager.setTargetSessionId(profile.sessionId)
                         _myProfile.value = profile
-                        fetched.value = true
+                        profileFetched.value = true
                     },
                     loadingEnable = false
                 )
@@ -105,14 +112,18 @@ class HomeViewModel @Inject constructor(
                 list.filter { it.userId != authSessionManager.uid }
                     .map { it.toPresentation() }
             }
-            .collectDataResource({ result ->
-                _userList.value = if (nextPage) {
-                    _userList.value + result
-                } else {
-                    result
-                }
-                hasMoreUserData = result.size == lastUserPageSize
-            })
+            .collectDataResource(
+                onSuccess = { result ->
+                    _userList.value = if (nextPage) {
+                        _userList.value + result
+                    } else {
+                        result
+                    }
+                    hasMoreUserData = result.size == lastUserPageSize
+                    userFetched.value = true
+                },
+                loadingEnable = false
+            )
     }
 
     // 최근 입장한 세션 목록 가져오기 nextPage : true면 다음 페이지, false면 초기화
@@ -130,14 +141,22 @@ class HomeViewModel @Inject constructor(
                 lastSessionVisible = list.last().participationTime
             }
             list.map { it.toPresentation() }
-        }.collectDataResource({ result ->
-            _sessionList.value = if (nextPage) {
-                _sessionList.value + result
-            } else {
-                result
-            }
-            hasMoreSessionData = result.size == lastSessionPageSize
-        })
+        }.collectDataResource(
+            onSuccess = { result ->
+                _sessionList.value = if (nextPage) {
+                    _sessionList.value?.plus(result)
+                } else {
+                    result
+                }
+                hasMoreSessionData = result.size == lastSessionPageSize
+                sessionFetched.value = true
+            },
+            onError = {
+                hideLoading("homeFragment")
+                event(Event.ShowErrorAlert(it))
+            },
+            loadingEnable = false
+        )
     }
 
     // 세션 참가 및 기록 저장
@@ -162,7 +181,7 @@ class HomeViewModel @Inject constructor(
                 authSessionManager.uid!!,
                 sessionId
             ).collectDataResource({
-                _sessionList.value = _sessionList.value.filterNot { it.sessionId == sessionId }
+                _sessionList.value = _sessionList.value?.filterNot { it.sessionId == sessionId }
             })
         }
     }
@@ -194,7 +213,6 @@ class HomeViewModel @Inject constructor(
     private suspend fun updateSessionID(uid: String, sessionId: String) {
         updateProfileSessionIdUseCase(uid, sessionId).await()
         authSessionManager.setTargetSessionId(sessionId)
-
     }
 
     // 세션 삭제
@@ -258,10 +276,12 @@ class HomeViewModel @Inject constructor(
 
     // 트리거 정리
     fun clearTrigger() {
-        fetched.value = false
+        profileFetched.value = false
     }
 
     sealed class Event : ViewEvent {
         data class Navigate(val target: HomeNavigationTarget) : Event()
+        data class ShowAlert(val message: String) : Event()
+        data class ShowErrorAlert(val throwable: Throwable) : Event()
     }
 }
