@@ -7,13 +7,13 @@ import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.livelocation.DeleteMyLocationUseCase
 import com.miiiin15.whereru.domain.usecase.livelocation.UpdateMyLocationUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.session.ExitSessionUserCase
 import com.miiiin15.whereru.domain.usecase.session.ObserveSessionUseCase
 import com.miiiin15.whereru.domain.usecase.session.StopObserveSessionUseCase
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
 import com.miiiin15.whereru.presentation.model.LiveLocationUserUiModel
 import com.miiiin15.whereru.presentation.model.LocationSessionUiModel
-import com.miiiin15.whereru.presentation.model.LocationUiModel
 import com.miiiin15.whereru.presentation.model.UserUiModel
 import com.miiiin15.whereru.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +28,7 @@ class LiveLocationViewModel @Inject constructor(
     private val deleteMyLocationUseCase: DeleteMyLocationUseCase,
     private val observeSessionUseCase: ObserveSessionUseCase,
     private val stopObserveSessionUseCase: StopObserveSessionUseCase,
+    private val exitSessionUseCase: ExitSessionUserCase,
     private val locationTracker: LocationTracker,
     private val authSessionManager: AuthSessionManager,
 ) : BaseViewModel<LiveLocationViewModel.Event>() {
@@ -77,9 +78,9 @@ class LiveLocationViewModel @Inject constructor(
                     },
                     onError = {
                         if (_sessionInfo.value?.hostId.isNullOrBlank()) {
-                            showAlert("${it.message}")
                             setObserveSessionState(false)
                             setTrackingState(false)
+                            event(Event.InvalidSession(it.message!!))
                             return@observeSessionUseCase
                         }
                     }
@@ -113,13 +114,8 @@ class LiveLocationViewModel @Inject constructor(
     }
 
     private fun updateMyLocation(location: MyLocationData) {
-        if (!_isWantTransmit.value) return
-        if (_sessionInfo.value?.hostId.isNullOrBlank()) {
-            showAlert("세션이 존재하지 않습니다.")
-            setObserveSessionState(false)
-            setTrackingState(false)
-            return
-        }
+        if (!_isWantTransmit.value || _sessionInfo.value?.hostId.isNullOrBlank()) return
+
         launch {
             if (!_myProfile.value?.nickname.isNullOrBlank()) {
                 updateMyLocationUseCase(
@@ -163,6 +159,16 @@ class LiveLocationViewModel @Inject constructor(
         }
     }
 
+    // 세션 참여 기록 삭제
+    fun deleteSession() {
+        launch {
+            exitSessionUseCase(
+                authSessionManager.uid!!,
+                authSessionManager.targetSessionId!!
+            ).await()
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         setObserveSessionState(false)
@@ -171,5 +177,6 @@ class LiveLocationViewModel @Inject constructor(
 
     sealed class Event : ViewEvent {
         data class UsersUpdated(val users: Map<String, LiveLocationUserUiModel>) : Event()
+        data class InvalidSession(val message: String) : Event()
     }
 }

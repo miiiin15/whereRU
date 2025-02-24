@@ -11,7 +11,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import com.miiiin15.whereru.presentation.model.LiveLocationUserUiModel
 import com.miiiin15.whereru.presentation.viewmodel.LiveLocationViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
@@ -38,11 +37,7 @@ class LiveLocationFragment :
         postponeEnterTransition()
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            showCustomAlert("세션을 이탈하시겠습니까?") {
-                viewModel.deleteMyLocation()
-                requireActivity().supportFragmentManager.popBackStack()
-            }
-
+            showCustomAlert("세션을 이탈하시겠습니까?") { exitSession() }
         }
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -134,6 +129,11 @@ class LiveLocationFragment :
         startPostponedEnterTransition()
     }
 
+    private fun exitSession() {
+        viewModel.deleteMyLocation()
+        requireActivity().supportFragmentManager.popBackStack()
+    }
+
 
     override fun handleEvent(event: LiveLocationViewModel.Event) {
         when (event) {
@@ -152,6 +152,15 @@ class LiveLocationFragment :
                     targetUerId = ""
                 }
             }
+
+            // 유효하지 않은 세션의 경우
+            is LiveLocationViewModel.Event.InvalidSession -> {
+                showCustomAlert(event.message)
+                exitSession()
+                viewModel.deleteSession()
+            }
+
+            else -> {}
         }
     }
 }
