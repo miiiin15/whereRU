@@ -108,7 +108,8 @@ proguard/
 /test-output/
 /app/src/androidTest/resources/
 /app/src/test/resources/
-/app/staging
+app/dev/
+app/prod/
 /generated/
 /output.json
 .vscode/
