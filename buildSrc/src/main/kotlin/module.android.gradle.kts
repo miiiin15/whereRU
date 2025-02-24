@@ -19,6 +19,10 @@ android {
             isMinifyEnabled = true
             consumerProguardFiles("proguard-rules.pro")
         }
+        create("staging") {
+            isMinifyEnabled = false
+            consumerProguardFiles("proguard-rules.pro")
+        }
         release {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

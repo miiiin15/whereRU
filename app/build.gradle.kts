@@ -1,5 +1,12 @@
 import java.util.Properties
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: "API key value is null"
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -22,21 +29,29 @@ android {
         versionCode = Releases.versionCode
         versionName = Releases.versionName
 
-        val localProperties = Properties()
-        val localPropertiesFile = rootProject.file("local.properties")
-        if (localPropertiesFile.exists()) {
-            localProperties.load(localPropertiesFile.inputStream())
-        }
-
-        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")  ?: "API key value is null"
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        release {
+        debug {
+            isDebuggable = true
+            manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        }
+        create("staging") {
+            isDebuggable = true
             isMinifyEnabled = false
+            manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        release {
+            isDebuggable = false
+            isMinifyEnabled = true
+            manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
