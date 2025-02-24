@@ -53,13 +53,20 @@ class HomeViewModel @Inject constructor(
     private val _friendList = MutableStateFlow<List<UserUiModel>>(emptyList())
     val friendList = _friendList.asStateFlow()
 
-    private var lastSessionVisible: Long? = null // 마지막 값을 저장할 변수
     private var lastSessionPageSize = 15
-    var hasMoreSessionData = true // 더 가저올 세션 데이터가 있나
-
-    private var lastUserVisible: Long? = null // 마지막 값을 저장할 변수
     private val lastUserPageSize = 15
-    var hasMoreUserData = true // 더 가저올 유저 데이터가 있나
+
+    var hasMoreData = mutableMapOf( // 더 가저올 세션 데이터가 있나
+        "sessionList" to true,
+        "userList" to true,
+        "friendList" to true
+    )
+
+    private var lastVisible = mutableMapOf(  // 마지막 값을 저장할 변수
+        "sessionList" to null as Long?,
+        "userList" to null as Long?,
+        "friendList" to null as Long?
+    )
 
     val profileFetched = MutableStateFlow(false)
     private val userFetched = MutableStateFlow(false)
@@ -100,14 +107,17 @@ class HomeViewModel @Inject constructor(
     // 유저 목록 가져오기 nextPage : true면 다음 페이지, false면 초기화
     fun loadPaginatedUserList(nextPage: Boolean) = launch {
         if (!nextPage) {
-            lastUserVisible = null
-            hasMoreUserData = true
-        } else if (!hasMoreUserData) return@launch
+            lastVisible["userList"] = null
+            hasMoreData["userList"] = true
+        } else if (hasMoreData["userList"] == false) return@launch
 
-        getPaginatedProfilesUseCase(if (nextPage) lastUserVisible else null, lastUserPageSize)
+        getPaginatedProfilesUseCase(
+            if (nextPage) lastVisible["userList"] else null,
+            lastUserPageSize
+        )
             .mapDataResource { list ->
                 if (list.isNotEmpty()) {
-                    lastUserVisible = list.last().lastLoginAt
+                    lastVisible["userList"] = list.last().lastLoginAt
                 }
                 list.filter { it.userId != authSessionManager.uid }
                     .map { it.toPresentation() }
@@ -119,7 +129,7 @@ class HomeViewModel @Inject constructor(
                     } else {
                         result
                     }
-                    hasMoreUserData = result.size == lastUserPageSize
+                    hasMoreData["userList"] = result.size == lastUserPageSize
                     userFetched.value = true
                 },
                 loadingEnable = false
@@ -129,16 +139,16 @@ class HomeViewModel @Inject constructor(
     // 최근 입장한 세션 목록 가져오기 nextPage : true면 다음 페이지, false면 초기화
     fun loadPaginatedSessionList(nextPage: Boolean) = launch {
         if (!nextPage) {
-            lastSessionVisible = null
-        } else if (!hasMoreSessionData) return@launch
+            lastVisible["sessionList"] = null
+        } else if (hasMoreData["sessionList"] == false) return@launch
 
         getPaginatedSessionListUserCase(
             authSessionManager.uid!!,
-            if (nextPage) lastSessionVisible else null,
+            if (nextPage) lastVisible["sessionList"] else null,
             lastUserPageSize
         ).mapDataResource { list ->
             if (list.isNotEmpty()) {
-                lastSessionVisible = list.last().participationTime
+                lastVisible["sessionList"] = list.last().participationTime
             }
             list.map { it.toPresentation() }
         }.collectDataResource(
@@ -148,7 +158,7 @@ class HomeViewModel @Inject constructor(
                 } else {
                     result
                 }
-                hasMoreSessionData = result.size == lastSessionPageSize
+                hasMoreData["sessionList"] = result.size == lastSessionPageSize
                 sessionFetched.value = true
             },
             onError = {

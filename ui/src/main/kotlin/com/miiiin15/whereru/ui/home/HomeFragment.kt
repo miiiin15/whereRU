@@ -42,7 +42,7 @@ class HomeFragment :
                 recentSessionClickAction(session)
         }, object : OnLoadMoreListener {
             override fun onLoadMore() {
-                if (viewModel.hasMoreSessionData) {
+                if (viewModel.hasMoreData["sessionList"] == true) {
                     viewModel.loadPaginatedSessionList(true)
                 }
             }
@@ -54,7 +54,7 @@ class HomeFragment :
                 allUserClickAction(user)
         }, object : OnLoadMoreListener {
             override fun onLoadMore() {
-                if (viewModel.hasMoreUserData) {
+                if (viewModel.hasMoreData["userList"] == true) {
                     viewModel.loadPaginatedUserList(true)
                 }
             }
