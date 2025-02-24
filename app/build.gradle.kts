@@ -58,6 +58,19 @@ android {
             )
         }
     }
+
+    flavorDimensions("default")
+    productFlavors {
+        create("dev") {
+            versionCode = Staging.versionCode
+            versionName = Staging.versionName
+        }
+        create("prod") {
+            versionCode = Releases.versionCode
+            versionName = Releases.versionName
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
