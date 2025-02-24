@@ -79,6 +79,7 @@ proguard/
 # ==========================
 
 ### API 키 및 인증 정보 ###
+/keystore
 /app/src/main/assets/secrets.json
 /secrets.properties
 
@@ -107,6 +108,7 @@ proguard/
 /test-output/
 /app/src/androidTest/resources/
 /app/src/test/resources/
+/app/staging
 /generated/
 /output.json
 .vscode/
