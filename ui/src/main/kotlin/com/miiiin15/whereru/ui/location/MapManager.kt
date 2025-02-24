@@ -17,7 +17,8 @@ class MapManager(
     @SuppressLint("MissingPermission")
     fun initializeMap(
         onMarkerClick: (marker: Marker) -> Unit,
-        onMapClick: () -> Unit
+        onMapClick: () -> Unit,
+        onInitialMyLocationCallback: (location: LatLng) -> Unit
     ) {
 
         googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
@@ -45,12 +46,23 @@ class MapManager(
         googleMap.setOnMapClickListener {
             onMapClick()
         }
+
+        // 내 위치 리스너 (1 회만 호출)
+        googleMap.setOnMyLocationChangeListener { location ->
+            onInitialMyLocationCallback(
+                LatLng(
+                    location.latitude,
+                    location.longitude
+                )
+            )
+            googleMap.setOnMyLocationChangeListener(null) // 리스너 제거
+        }
     }
 
-fun moveCamera(latLng: LatLng, zoomLevel: Float = googleMap.cameraPosition.zoom) {
-    googleMap.animateCamera(
-        CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel)
-    )
-}
+    fun moveCamera(latLng: LatLng, zoomLevel: Float = googleMap.cameraPosition.zoom) {
+        googleMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel)
+        )
+    }
 
 }

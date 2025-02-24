@@ -11,6 +11,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.miiiin15.whereru.presentation.model.LiveLocationUserUiModel
 import com.miiiin15.whereru.presentation.viewmodel.LiveLocationViewModel
 import com.miiiin15.whereru.ui.R
 import com.miiiin15.whereru.ui.base.BaseFragment
@@ -27,11 +28,14 @@ class LiveLocationFragment :
     private var mapManager: MapManager? = null
     private lateinit var markerManager: MarkerManager
 
-    private var isCameraMoved = false
+    private var isCameraMove = false
     private var targetUerId: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.showLoading("LiveLocationFragment")
+        postponeEnterTransition()
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             showCustomAlert("세션을 이탈하시겠습니까?") {
@@ -68,12 +72,12 @@ class LiveLocationFragment :
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-
         // 지도 초기화
         mapManager = MapManager(googleMap).apply {
             initializeMap(
                 onMarkerClick = { targetOn(it) },
                 onMapClick = { targetOff() },
+                onInitialMyLocationCallback = { startTransition(it) }
             )
         }
 
@@ -85,6 +89,7 @@ class LiveLocationFragment :
                 }
                 newUser?.let {
                     showToast("${it.nickname}님이 세션에 들어오셨습니다.")
+                    startTransition(LatLng(it.location.latitude, it.location.longitude))
                 }
             }
         }
@@ -121,22 +126,17 @@ class LiveLocationFragment :
         targetUerId = null
     }
 
+    private fun startTransition(location: LatLng?) {
+        if (isCameraMove) return else isCameraMove = true
+
+        location.let { mapManager?.moveCamera(it!!, 17f) }
+        viewModel.hideLoading("LiveLocationFragment")
+        startPostponedEnterTransition()
+    }
+
 
     override fun handleEvent(event: LiveLocationViewModel.Event) {
         when (event) {
-            // 내 위치 업데이트
-            is LiveLocationViewModel.Event.MyLocationUpdated -> {
-                if (!isCameraMoved) {
-                    mapManager?.moveCamera(
-                        LatLng(
-                            event.location.latitude,
-                            event.location.longitude
-                        ), 17f
-                    )
-                    isCameraMoved = true
-                }
-            }
-
             // 세션 유저 목록 업데이트
             is LiveLocationViewModel.Event.UsersUpdated -> {
                 binding.liveLocationMarkerCountText.text = "${event.users.size}"

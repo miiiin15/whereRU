@@ -33,10 +33,7 @@ class LiveLocationViewModel @Inject constructor(
 ) : BaseViewModel<LiveLocationViewModel.Event>() {
 
     private val _myProfile = MutableStateFlow<UserUiModel?>(null)
-    val myProfile = _myProfile.asStateFlow()
-
     private val _sessionInfo = MutableStateFlow<LocationSessionUiModel?>(null)
-    val sessionInfo = _sessionInfo.asStateFlow()
 
     private val _isWantTransmit = MutableStateFlow(true)
     val isWantTransmit = _isWantTransmit.asStateFlow()
@@ -155,7 +152,13 @@ class LiveLocationViewModel @Inject constructor(
     fun currentMyLocation() {
         launch {
             locationTracker.getCurrentLocation()?.let { location ->
-                event(Event.MyLocationUpdated(location.toPresentation()))
+                updateMyLocation(
+                    MyLocationData(
+                        location.latitude,
+                        location.longitude,
+                        location.timestamp
+                    )
+                )
             } ?: return@launch
         }
     }
@@ -167,7 +170,6 @@ class LiveLocationViewModel @Inject constructor(
     }
 
     sealed class Event : ViewEvent {
-        data class MyLocationUpdated(val location: LocationUiModel) : Event()
         data class UsersUpdated(val users: Map<String, LiveLocationUserUiModel>) : Event()
     }
 }
