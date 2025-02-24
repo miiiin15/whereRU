@@ -8,6 +8,11 @@ object Modules {
     val common = ":common"
 }
 
+object Develop {
+    val versionCode = 1
+    val versionName = "1.0.1"
+}
+
 object Releases {
     val versionCode = 1
     val versionName = "1.0.0"

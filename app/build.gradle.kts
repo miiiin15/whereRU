@@ -62,8 +62,8 @@ android {
     flavorDimensions("default")
     productFlavors {
         create("dev") {
-            versionCode = Staging.versionCode
-            versionName = Staging.versionName
+            versionCode = Develop.versionCode
+            versionName = Develop.versionName
         }
         create("prod") {
             versionCode = Releases.versionCode
