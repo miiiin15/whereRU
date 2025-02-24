@@ -75,6 +75,10 @@ class HomeFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // 화면 전환 정지 걸어 놓고 로그인 화면에서 로딩 시작한 것 처럼
+        viewModel.showLoading("homeFragment")
+        postponeEnterTransition()
+
         // 다른 화면 갔다가 돌아 왔을 때
         findNavController().addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.homeFragment) {
@@ -100,10 +104,6 @@ class HomeFragment :
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // 화면 전환 정지 걸어 놓고 로그인 화면에서 로딩 시작한 것 처럼
-        viewModel.showLoading("homeFragment")
-        postponeEnterTransition()
 
         binding {
             vm = viewModel
