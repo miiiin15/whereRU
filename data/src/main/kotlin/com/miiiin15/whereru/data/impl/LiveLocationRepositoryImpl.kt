@@ -39,5 +39,4 @@ internal class LiveLocationRepositoryImpl @Inject constructor(
             liveLocationRemoteDataSource.deleteMyLocation(sessionId, userId)
         }
 
-    // TODO : local과 연계
 }

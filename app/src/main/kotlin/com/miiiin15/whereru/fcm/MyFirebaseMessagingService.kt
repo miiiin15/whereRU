@@ -19,9 +19,7 @@ import com.miiiin15.whereru.ui.main.MainActivity
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
-    override fun onNewToken(token: String) {
-        // TODO : 새로운 토큰을 서버에 전송하는 로직 필요시 작성
-    }
+    override fun onNewToken(token: String) {}
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         val data = remoteMessage.data  // Map<String, String>

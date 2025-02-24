@@ -12,5 +12,3 @@ fun LifecycleOwner.repeatOnStarted(block: suspend CoroutineScope.() -> Unit) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
     }
 }
-
-// TODO : 다른 상태 함수도 필요 시 추가 ex) repeatOnResumed

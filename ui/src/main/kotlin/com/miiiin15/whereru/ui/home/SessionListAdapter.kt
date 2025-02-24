@@ -84,11 +84,7 @@ class SessionListAdapter(
         override fun setData(data: JoinedSessionUiModel) {
             sessionBinding.sessionInfo = data
             sessionBinding.executePendingBindings()
-            // TODO : Glide로 프로필 이미지 로딩
         }
 
-        fun showAlert() {
-            // TODO : 후속 액션 안내 창 띄우기
-        }
     }
 }

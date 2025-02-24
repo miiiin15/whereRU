@@ -42,7 +42,5 @@
 
     </application>
 
-<!--    TODO : 제거해도 이상없는 지 테스트 해볼것-->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
 </manifest>

@@ -10,7 +10,6 @@ data class LiveLocationUserUiModel(
     val profileImageUrl: String?,
     val location: LocationUiModel,
 )
-// TODO : UI상에 어떤 시간을 표기 할건지 고려하기
 
 fun LiveLocationUser.toPresentation(): LiveLocationUserUiModel {
     val timeValue: String = liveLocationData.timestamp.toRelativeTime()

@@ -20,5 +20,4 @@ internal class AuthRepositoryImpl @Inject constructor(
         flowDataResource {
             authRemoteDataSource.register(email, password) }
 
-    // TODO : local과 연계
 }

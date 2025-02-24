@@ -10,8 +10,6 @@ data class LocationUiModel(
     val timestamp: String    // 위치 업데이트 시간
 )
 
-// TODO : UI상에 어떤 시간을 표기 할건지 고려하기
-
 fun MyLocationData.toPresentation(): LocationUiModel {
     val timeValue: String = timestamp.toString()
     return LocationUiModel(latitude, longitude, timeValue)

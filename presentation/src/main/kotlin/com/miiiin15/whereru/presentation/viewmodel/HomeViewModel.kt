@@ -250,10 +250,7 @@ class HomeViewModel @Inject constructor(
                 timestamp = System.currentTimeMillis()
             )
 
-            sendPushMessageUseCase(userData.fcmToken!!, message)
-                .collectDataResource({
-                    // TODO : FCM 전송 성공 시 처리
-                })
+            sendPushMessageUseCase(userData.fcmToken!!, message).await()
         }
     }
 
@@ -277,10 +274,7 @@ class HomeViewModel @Inject constructor(
                 timestamp = System.currentTimeMillis()
             )
 
-            sendPushMessageUseCase(receivedMessage.fromToken, message)
-                .collectDataResource({
-                    // TODO : FCM 전송 성공 시 처리
-                })
+            sendPushMessageUseCase(receivedMessage.fromToken, message).await()
         }
     }
 

@@ -44,8 +44,6 @@ class LiveLocationViewModel @Inject constructor(
     private val _isWantReceive = MutableStateFlow(true)
     val isWantReceive = _isWantReceive.asStateFlow()
 
-    private val _isHost = MutableStateFlow(false)
-    val isHost = _isHost.asStateFlow()
 
     init {
         fetchProfile()
@@ -57,7 +55,6 @@ class LiveLocationViewModel @Inject constructor(
                 .mapDataResource { it.toPresentation() }
                 .collectDataResource({ profile ->
                     _myProfile.value = profile
-                    _isHost.value = authSessionManager.uid == _sessionInfo.value?.hostId
                 })
         }
     }
