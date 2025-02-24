@@ -112,6 +112,10 @@ class HomeFragment :
                 viewModel.event(Navigate(HomeNavigationTarget.ToProfileEdit))
             }
 
+            homeLogoutButton.setOnClickListener {
+                showCustomAlert("로그아웃 하시겠습니까?") { viewModel.logout() }
+            }
+
             homeNavigateLocationButton.setOnClickListener {
                 val sessionIdDisable = viewModel.myProfile.value?.sessionId.isNullOrBlank()
                 showCustomBottomSheet(
@@ -358,6 +362,12 @@ class HomeFragment :
                         val action = HomeFragmentDirections.actionHomeToProfile()
                         findNavController().navigate(action)
                         viewModel.clearTrigger()
+                    }
+
+                    HomeNavigationTarget.Logout -> {
+                        val intent = requireActivity().intent
+                        requireActivity().finish()
+                        requireActivity().startActivity(intent)
                     }
 
                     null -> {}

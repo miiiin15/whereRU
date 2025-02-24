@@ -9,12 +9,14 @@ import com.miiiin15.whereru.domain.session.AuthSessionManager
 import com.miiiin15.whereru.domain.usecase.fcm.SendPushMessageUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetPaginatedProfilesUseCase
 import com.miiiin15.whereru.domain.usecase.profile.GetProfileUseCase
+import com.miiiin15.whereru.domain.usecase.profile.UpdateProfileFCMTokenUseCase
 import com.miiiin15.whereru.domain.usecase.profile.UpdateProfileSessionIdUseCase
 import com.miiiin15.whereru.domain.usecase.session.CreateSessionUseCase
 import com.miiiin15.whereru.domain.usecase.session.DeleteSessionUseCase
 import com.miiiin15.whereru.domain.usecase.session.ExitSessionUserCase
 import com.miiiin15.whereru.domain.usecase.session.GetPaginatedSessionListUserCase
 import com.miiiin15.whereru.domain.usecase.session.ParticipationSessionUseCase
+import com.miiiin15.whereru.local.pref.PrefUtil
 import com.miiiin15.whereru.presentation.base.BaseViewModel
 import com.miiiin15.whereru.presentation.base.ViewEvent
 import com.miiiin15.whereru.presentation.model.JoinedSessionUiModel
@@ -37,8 +39,10 @@ class HomeViewModel @Inject constructor(
     private val createSessionUseCase: CreateSessionUseCase,
     private val deleteSessionUseCase: DeleteSessionUseCase,
     private val updateProfileSessionIdUseCase: UpdateProfileSessionIdUseCase,
+    private val updateFcmTokenUseCase: UpdateProfileFCMTokenUseCase,
     private val sendPushMessageUseCase: SendPushMessageUseCase,
     private val authSessionManager: AuthSessionManager,
+    private val prefUtil: PrefUtil
 ) : BaseViewModel<HomeViewModel.Event>() {
 
     private val _myProfile = MutableStateFlow<UserUiModel?>(null)
@@ -275,6 +279,19 @@ class HomeViewModel @Inject constructor(
             )
 
             sendPushMessageUseCase(receivedMessage.fromToken, message).await()
+        }
+    }
+
+    fun logout() {
+        launch {
+            updateFcmTokenUseCase(
+                authSessionManager.uid!!,
+                ""
+            ).collectDataResource({
+                authSessionManager.clear()
+                prefUtil.clearAuthInfoModel()
+                event(Event.Navigate(HomeNavigationTarget.Logout))
+            })
         }
     }
 

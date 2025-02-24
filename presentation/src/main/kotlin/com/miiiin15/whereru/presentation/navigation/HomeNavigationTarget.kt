@@ -4,4 +4,5 @@ sealed class HomeNavigationTarget {
     object ToLiveLocation : HomeNavigationTarget()
     object ToProfileEdit : HomeNavigationTarget()
     object ToSetting : HomeNavigationTarget()
+    object Logout : HomeNavigationTarget()
 }
