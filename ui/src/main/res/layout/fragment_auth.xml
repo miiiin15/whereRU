@@ -62,10 +62,18 @@
                 style="@style/InputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_input_field"
                 android:hint="비밀번호 입력"
+                android:layout_marginBottom="4dp"
                 android:inputType="textPassword"
                 android:text="@={vm.password}" />
+
+            <TextView
+                style="@style/Description"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_input_field"
+                android:text="※ 정보를 입력 후 버튼을 눌러주세요."/>
 
         </LinearLayout>
 
