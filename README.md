@@ -9,7 +9,7 @@
     - **Firebase**: FCM, Realtime Database, auth, firestore
     - **ETC**: shimmer, colorpickerpreference
 # 특징
-### 통일된 비즈니스 로직 상태 관리
+### Flow + DataResource 기반 API 상태 관리 및 에러 핸들링
 - **선언** [🔗DataResource.kt](https://github.com/miiiin15/whereRU/blob/release/mvp/data-resource/src/main/java/com/miiiin15/whereru/data_resource/DataResource.kt#L3)
 ```kotlin
 sealed class DataResource<out T> {
@@ -49,7 +49,7 @@ suspend fun <T> Flow<DataResource<T>>.collectDataResource(
     }
 ```
 
-### 로컬 캐싱 연계로 개선된 사용자 경험 제공
+### Room과 연계 오프라인 캐싱을 통한 UX 개선
 - **확장** [🔗FlowPersistableRemoteBoundResource.kt](data/src/main/kotlin/com/miiiin15/whereru/data/bound/FlowPersistableRemoteBoundResource.kt)
 ```kotlin
 class FlowPersistableRemoteBoundResource<DomainType, DataType>(
@@ -120,7 +120,7 @@ override fun getPaginatedProfiles(
   </tbody>
 </table>
 
-### 주요 RecyclerView에  DiffUtil.Callback을 통한 렌더링 비용 절감
+### 주요 RecyclerView에 DiffUtil.Callback 적용을 통한 최적화
 - **선언** [🔗UserDiffCallback.kt](ui/src/main/kotlin/com/miiiin15/whereru/ui/home/UserDiffCallback.kt)
 - **사용** [🔗UserListAdapter.kt](https://github.com/miiiin15/whereRU/blob/1f45c0b3fd715a5f19d0ae4abd07a4fb3c81145b/ui/src/main/kotlin/com/miiiin15/whereru/ui/home/UserListAdapter.kt#L28)
 # 기능
