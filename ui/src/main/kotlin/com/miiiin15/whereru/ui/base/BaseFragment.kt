@@ -26,6 +26,7 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
         get() = _binding ?: throw IllegalStateException("fragment destroyed!")
 
     private val loadingDialog by lazy { LoadingDialog() }
+    private var customBottomSheetDialog: CustomBottomSheetDialog? = null
 
     abstract val viewModel: VM
     abstract fun handleEvent(event: VE)
@@ -76,6 +77,22 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
         }
     }
 
+//    fun showCustomBottomSheet(
+//        content: String = " ",
+//        buttonLeftText: String = "닫기",
+//        buttonRightText: String = "확인",
+//        onLeftButtonClick: () -> Unit = { },
+//        onRightButtonClick: () -> Unit? = { }
+//    ) {
+//        CustomBottomSheetDialog(
+//            content = content,
+//            buttonLeftText = buttonLeftText,
+//            buttonRightText = buttonRightText,
+//            onLeftButtonClick = onLeftButtonClick,
+//            onRightButtonClick = onRightButtonClick
+//        ).show(childFragmentManager, "CustomBottomSheetDialog")
+//    }
+
     fun showCustomBottomSheet(
         content: String = " ",
         buttonLeftText: String = "닫기",
@@ -83,13 +100,20 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
         onLeftButtonClick: () -> Unit = { },
         onRightButtonClick: () -> Unit? = { }
     ) {
-        CustomBottomSheetDialog(
+        customBottomSheetDialog?.dismissAllowingStateLoss()
+        customBottomSheetDialog = CustomBottomSheetDialog(
             content = content,
             buttonLeftText = buttonLeftText,
             buttonRightText = buttonRightText,
             onLeftButtonClick = onLeftButtonClick,
             onRightButtonClick = onRightButtonClick
-        ).show(childFragmentManager, "CustomBottomSheetDialog")
+        )
+        customBottomSheetDialog?.show(childFragmentManager, "CustomBottomSheetDialog")
+    }
+
+    fun hideCustomBottomSheet() {
+        customBottomSheetDialog?.dismissAllowingStateLoss()
+        customBottomSheetDialog = null
     }
 
     fun showCustomAlert(message: String, onConfirmed: (() -> Unit)? = null) {

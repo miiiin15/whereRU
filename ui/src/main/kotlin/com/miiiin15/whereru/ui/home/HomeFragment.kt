@@ -197,6 +197,11 @@ class HomeFragment :
         setViewPager()
     }
 
+    override fun onPause() {
+        super.onPause()
+        hideCustomBottomSheet()
+    }
+
     override fun onResume() {
         super.onResume()
         FCMMessageHolder.consume()?.let { message ->
