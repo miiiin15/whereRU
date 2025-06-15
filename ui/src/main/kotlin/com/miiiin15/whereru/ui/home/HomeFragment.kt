@@ -76,8 +76,10 @@ class HomeFragment :
         super.onCreate(savedInstanceState)
 
         // 화면 전환 정지 걸어 놓고 로그인 화면에서 로딩 시작한 것 처럼
-        viewModel.showLoading("homeFragment")
-        postponeEnterTransition()
+        if (savedInstanceState == null) {
+            viewModel.showLoading("homeFragment")
+            postponeEnterTransition()
+        }
 
         // 다른 화면 갔다가 돌아 왔을 때
         findNavController().addOnDestinationChangedListener { _, destination, _ ->
@@ -264,26 +266,22 @@ class HomeFragment :
                 }
             })
         }
-
     }
 
     // ViewPager2 Adapter 내부 바인딩 용
     fun bindViewPager(position: Int, recyclerView: RecyclerView, emptyView: LinearLayout) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
         when (position) {
             0 -> {
                 recyclerView.adapter = sessionListAdapter
                 sessionListAdapter.setEmptyView(emptyView)
                 isAdapterInitialized["sessionList"] = true
             }
-
             1 -> {
                 recyclerView.adapter = userListAdapter
                 userListAdapter.setEmptyView(emptyView)
                 isAdapterInitialized["allUserList"] = true
             }
-
             2 -> {
                 recyclerView.adapter = friendListAdapter
                 friendListAdapter.setEmptyView(emptyView)
