@@ -197,7 +197,6 @@ class HomeFragment :
         setViewPager()
     }
 
-
     override fun onResume() {
         super.onResume()
         FCMMessageHolder.consume()?.let { message ->
@@ -276,16 +275,21 @@ class HomeFragment :
                 recyclerView.adapter = sessionListAdapter
                 sessionListAdapter.setEmptyView(emptyView)
                 isAdapterInitialized["sessionList"] = true
+                viewModel.sessionList.value?.let { sessionListAdapter.resetAll(it) }
             }
+
             1 -> {
                 recyclerView.adapter = userListAdapter
                 userListAdapter.setEmptyView(emptyView)
                 isAdapterInitialized["allUserList"] = true
+                viewModel.userList.value?.let { userListAdapter.resetAll(it) }
             }
+
             2 -> {
                 recyclerView.adapter = friendListAdapter
                 friendListAdapter.setEmptyView(emptyView)
                 isAdapterInitialized["friendList"] = true
+//                viewModel.friendList.value?.let { friendListAdapter.resetAll(it) }
             }
         }
     }
