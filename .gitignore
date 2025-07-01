@@ -94,8 +94,6 @@ proguard/
 ### Data 모듈 관련 ###
 /data/src/main/res/raw/*.json
 
-### UI 모듈 관련 ###
-/ui/src/main/res/drawable/
 
 ### Local DB (Room, SQLite) ###
 *.db
