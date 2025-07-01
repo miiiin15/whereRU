@@ -22,6 +22,16 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    signingConfigs {
+        create("staging") {
+            storeFile = file(localProperties.getProperty("KEYSTORE_FILE"))
+            storePassword = localProperties.getProperty("KEYSTORE_PASSWORD")
+            keyAlias = localProperties.getProperty("KEY_ALIAS")
+            keyPassword = localProperties.getProperty("KEY_PASSWORD")
+        }
+    }
+
     defaultConfig {
         applicationId = ApplicationId.id
         minSdk = Config.minSdk
@@ -43,6 +53,7 @@ android {
             isDebuggable = true
             isMinifyEnabled = false
             manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+            signingConfig = signingConfigs.getByName("staging")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -58,6 +69,7 @@ android {
             )
         }
     }
+
 
     flavorDimensions("default")
     productFlavors {

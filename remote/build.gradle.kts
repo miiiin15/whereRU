@@ -19,7 +19,7 @@ android {
         buildConfigField(
             "String",
             "FCM_PROJECT_ID",
-            "\"${localProperties.getProperty("fcm.projectId") ?: ""}\""
+            "\"${localProperties.getProperty("FCM_PROJECT_ID") ?: ""}\""
         )
     }
 }
