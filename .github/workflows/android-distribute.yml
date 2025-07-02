@@ -32,7 +32,7 @@ jobs:
           mkdir -p app/src/dev/staging
           echo "${{ secrets.GOOGLE_SERVICES_JSON_B64 }}" | base64 -d > app/src/dev/staging/google-services.json
 
-      - name: Restore keystore file and create local.properties
+      - name: Set up keystore file and create local.properties
         run: |
           echo "${{ secrets.KEYSTORE_FILE_B64 }}" | base64 -d > keystore.jks
           echo "KEYSTORE_FILE=$(pwd)/keystore.jks" > local.properties
@@ -41,18 +41,27 @@ jobs:
           echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> local.properties
           echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> local.properties
 
+      - name: Check keystore.jks file
+        run: ls -l keystore.jks
+
       - name: Build devStaging APK
         run: ./gradlew app:assembleDevStaging --stacktrace --warning-mode all
 
-      - name: List APK files
+      - name: Check APK files
         run: find app/build/outputs/apk -name "*.apk"
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
+
+      - name: Get latest commit message
+        id: commitmsg
+        run: |
+          echo "COMMIT_MSG=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
 
       - name: Distribute to Firebase App Distribution
         run: |
           firebase appdistribution:distribute app/build/outputs/apk/dev/staging/app-dev-staging.apk \
             --app 1:473099601228:android:fe1fbfe3564c68f71d7be9 \
             --groups "mvp" \
-            --token ${{ secrets.FIREBASE_TOKEN }}
+            --token ${{ secrets.FIREBASE_TOKEN }} \
+            --release-notes "${{ env.COMMIT_MSG }}"
