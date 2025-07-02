@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
@@ -37,6 +39,21 @@ abstract class BaseFragment<B : ViewDataBinding, VM : BaseViewModel<VE>, VE : Vi
         savedInstanceState: Bundle?
     ): View? {
         _binding = DataBindingUtil.inflate(inflater, layoutResId, container, false)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val originPaddingLeft = view.paddingLeft
+            val originPaddingRight = view.paddingRight
+
+            view.setPadding(
+                originPaddingLeft,
+                systemInsets.top,
+                originPaddingRight,
+                systemInsets.bottom
+            )
+            insets
+        }
+
         return binding.root
     }
 

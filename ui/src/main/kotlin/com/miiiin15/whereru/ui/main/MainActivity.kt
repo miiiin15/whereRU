@@ -11,6 +11,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.miiiin15.whereru.common.utils.PermissionManager
 import com.miiiin15.whereru.presentation.fcm.FCMMessageMapper
 import com.miiiin15.whereru.presentation.fcm.FCMMessageHolder
@@ -24,6 +26,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         PermissionManager.askNotificationPermission(this, requestPermissionLauncher)
+
+        // 시스템 상태바 아이콘 색상 검정으로
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
+
         handleFcmPushIntent()
     }
 
