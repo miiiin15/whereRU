@@ -10,7 +10,7 @@ object Modules {
 
 object Develop {
     val versionCode = 1
-    val versionName = "1.0.1"
+    val versionName = "1.1.0"
 }
 
 object Releases {
