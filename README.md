@@ -3,11 +3,12 @@
 - **구조**: MVVM, Clean Architecture지향 / [🔗구조도](docs/whereRU_architecture.png)
 - **기본**: Kotlin, Coroutine, Hilt, Room, Retrofit
 - **빌드**: Multi Module, Precompiled Scripts
-- **테스트**: junit, mockk, Firebase App Distribution / [👥테스터 초대 링크](https://appdistribution.firebase.dev/i/fda00582e7173283)
+- **CI/CD**: GitHub Actions, Firebase App Distribution / [👥테스터 초대 링크](https://appdistribution.firebase.dev/i/fda00582e7173283)
+- **테스트**: junit, mockk
 - **SDK**:
-    - **Google**: maps, location, oauth2
-    - **Firebase**: FCM, Realtime Database, auth, firestore
-    - **ETC**: shimmer, colorpickerpreference
+  - **Google**: maps, location, oauth2
+  - **Firebase**: FCM, Realtime Database, auth, firestore
+  - **ETC**: shimmer, colorpickerpreference
 # 특징
 ### Flow + DataResource 기반 API 상태 관리 및 에러 핸들링
 - **선언** [🔗DataResource.kt](https://github.com/miiiin15/whereRU/blob/release/mvp/data-resource/src/main/java/com/miiiin15/whereru/data_resource/DataResource.kt#L3)
@@ -21,18 +22,18 @@ sealed class DataResource<out T> {
 - **확장** [🔗FlowDataResourceExtension.kt](https://github.com/miiiin15/whereRU/blob/1f45c0b3fd715a5f19d0ae4abd07a4fb3c81145b/data-resource/src/main/java/com/miiiin15/whereru/data_resource/FlowDataResourceExtension.kt#L11-L25)
 ```kotlin
 suspend fun <T> Flow<DataResource<T>>.collectDataResource(
-    onSuccess: suspend (T) -> Unit,
-    onError: (Throwable) -> Unit,
-    onLoading: (T?) -> Unit = {},
+  onSuccess: suspend (T) -> Unit,
+  onError: (Throwable) -> Unit,
+  onLoading: (T?) -> Unit = {},
 ) {
-    this.catch { onError(it) }
-        .collect {
-            when (it) {
-                is DataResource.Success -> onSuccess(it.data)
-                is DataResource.Error -> onError(it.throwable)
-                is DataResource.Loading -> onLoading.invoke(it.data)
-            }
-        }
+  this.catch { onError(it) }
+    .collect {
+      when (it) {
+        is DataResource.Success -> onSuccess(it.data)
+        is DataResource.Error -> onError(it.throwable)
+        is DataResource.Loading -> onLoading.invoke(it.data)
+      }
+    }
 }
 ```
 - **사용** [🔗LiveLocationViewModel.kt](https://github.com/miiiin15/whereRU/blob/1f45c0b3fd715a5f19d0ae4abd07a4fb3c81145b/presentation/src/main/kotlin/com/miiiin15/whereru/presentation/viewmodel/LiveLocationViewModel.kt#L50-L58)
@@ -128,9 +129,8 @@ override fun getPaginatedProfiles(
 - 특정 사용자에게 푸시 메시지(FCM)를 통한 공유 요청 및 답장
 - [🔗in-app 화면](docs/whereRU_in_app.md)
 # 환경
-- **Kotlin**: 1.9.10
-- **AGP**: 8.1.1
-- **Coroutines**: 1.7.3
-- **Hilt (DI)**: 2.48
-- **Google Maps Compose**: 4.3.3
-- **Firebase**: BOM 32.5.0
+- **Kotlin**: 1.9.25
+- **AGP**: 8.3.2
+- **Coroutines**: 1.9.0
+- **Dagger:Hilt (DI)**: 2.51.1
+- **Google Maps Compose**: 5.0.0
