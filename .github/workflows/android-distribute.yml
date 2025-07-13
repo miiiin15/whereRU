@@ -45,6 +45,9 @@ jobs:
       - name: Check keystore.jks file
         run: ls -l keystore.jks
 
+      - name: Run unit tests
+        run: ./gradlew test --stacktrace --warning-mode all
+
       - name: Build devStaging APK
         run: ./gradlew app:assembleDevStaging --stacktrace --warning-mode all
 
