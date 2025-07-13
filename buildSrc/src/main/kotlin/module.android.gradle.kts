@@ -56,4 +56,5 @@ dependencies {
     testImplementation(libs.getLibrary("junit"))
     testImplementation(libs.getLibrary("coroutines.test"))
     testImplementation(libs.getLibrary("mockk.android"))
+    testImplementation(libs.getLibrary("core.testing"))
 }
