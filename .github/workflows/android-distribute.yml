@@ -45,6 +45,22 @@ jobs:
       - name: Check keystore.jks file
         run: ls -l keystore.jks
 
+      - name: Make google-services.json directories
+        run: |
+          mkdir -p app/src/dev/debug
+          mkdir -p app/src/dev/release
+          mkdir -p app/src/prod/debug
+          mkdir -p app/src/prod/staging
+          mkdir -p app/src/prod/release
+
+      - name: Copy google-services.json for unit tests
+        run: |
+          cp app/src/dev/staging/google-services.json app/src/dev/debug/google-services.json
+          cp app/src/dev/staging/google-services.json app/src/dev/release/google-services.json
+          cp app/src/dev/staging/google-services.json app/src/prod/debug/google-services.json
+          cp app/src/dev/staging/google-services.json app/src/prod/staging/google-services.json
+          cp app/src/dev/staging/google-services.json app/src/prod/release/google-services.json
+
       - name: Run unit tests
         run: ./gradlew test --stacktrace --warning-mode all
 
